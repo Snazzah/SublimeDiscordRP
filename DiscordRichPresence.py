@@ -169,13 +169,6 @@ def ba_write(ba, string, offset, length):
 			raise Exception("OUT_OF_BOUNDS")
 		ba[offset+i] = ord(string[i])
 
-def sizehf(num):
-    for unit in ['','K','M','G','T','P','E','Z']:
-        if abs(num) < 1024.0:
-            return "%3.1f%s%s" % (num, unit, 'B')
-        num /= 1024.0
-    return "%.1f%s%s" % (num, 'Yi', 'B')
-
 """
 IPC Connections
 
@@ -186,9 +179,15 @@ IPC Connections
   4 - PONG
 """
 
+def sizehf(num):
+    for unit in ['','K','M','G','T','P','E','Z']:
+        if abs(num) < 1024.0:
+            return "%3.1f%s%s" % (num, unit, 'B')
+        num /= 1024.0
+    return "%.1f%s%s" % (num, 'Yi', 'B')
+
 class DRPIPC(object):
 	def __init__(self):
-		#self.thread = DRPThread(self)
 		self.open = False
 		self.pipe = None
 
@@ -202,7 +201,6 @@ class DRPIPC(object):
 		try:
 			self.pipe = os.open(path, os.O_RDWR)
 			self.open = True
-			#self.thread.start()
 			print('[DiscordRP] Sending Handshake')
 			self.send({ 'v': 1, 'client_id': DISCORD_CLIENT_ID }, 0)
 		except OSError as error:
@@ -242,61 +240,10 @@ class DRPIPC(object):
 	def on_close(self):
 		if self.open == True:
 			self.open == False
-			#self.thread.pause()
 			print('[DiscordRP] IPC closed')
 
 	def set_activity(self, act):
 		self.send({ 'cmd': 'SET_ACTIVITY', 'args': { 'pid': os.getpid(), 'activity': act }, 'nonce': DRPSnowflake.generate() })
-
-# https://stackoverflow.com/questions/15729498/how-to-start-and-stop-thread
-"""
-
-class DRPThread(threading.Thread):
-	def __init__(self, ipc):
-		print('[DiscordRP] DPCThread __init__')
-		threading.Thread.__init__(self)
-		self.daemon = True
-		self.paused = True
-		self.ipc = ipc
-		self.state = threading.Condition()
-
-	def run(self):
-		self.resume()
-		while True:
-			with self.state:
-				if self.paused:
-					self.state.wait()
-			packet = os.read(self.ipc.pipe, 1000)
-			self.ipc.handle_packet(packet)
-
-	def resume(self):
-		with self.state:
-			self.paused = False
-			self.state.notify()
-
-	def pause(self):
-		with self.state:
-			self.paused = True
-"""
-
-"""
-
-{
-    state: args.state,
-    details: args.details,
-    timestamps: {
-		start: START_TIME
-    },
-    assets: {
-        large_image: args.largeImageKey,
-        large_text: args.largeImageText,
-        small_image: args.smallImageKey,
-        small_text: args.smallImageText,
-    },
-    instance: false
-}
-
-"""
 
 class DRPSnowflake(object):
 	EPOCH = 1420070400000
@@ -336,17 +283,6 @@ def get_ipc_path(id=0):
 			return None
 	prefix = get_env('XDG_RUNTIME_DIR') or get_env('TMPDIR') or get_env('TMP') or get_env('TEMP') or '/tmp'
 	return '%s/discord-ipc-%s' % (prefix.replace(r"\/$", ''), id)
-
-"""
-Sublime Text Activity
-
-	{file} - os.path.basename(entity)
-	{project} - find_project_from_folders(folders, entity)
-	{size} - view.size()
-	{sizehf} - sizehf(view.size())
-	{extension} - os.path.splitext(entity)[1]
-	{folders} - len(window.folders())
-"""
 
 def handle_activity(view, is_write=False):
 	window = view.window()
