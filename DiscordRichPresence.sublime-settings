@@ -2,8 +2,8 @@
 // This settings file will be overwritten when upgrading.
 
 {
-    // Whether or not the IPC with connect automatically. Defaults to true.
-    "enabled": true,
+    // Whether or not to connect to Discord on startup. Defaults to true.
+    "connect_on_startup": true,
 
     // Whether not to have verbose logs. Defaults to false.
     "debug": false,

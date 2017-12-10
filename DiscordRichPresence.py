@@ -341,6 +341,8 @@ def plugin_loaded():
 	SETTINGS = sublime.load_settings(SETTINGS_FILE)
 	print('[DiscordRP] Loaded')
 	IPC = DRPIPC()
+	if not SETTINGS.get('connect_on_startup') == True
+		return
 	print('[DiscordRP] Starting IPC with client id %s' % DISCORD_CLIENT_ID)
 	IPC.connect()
 
