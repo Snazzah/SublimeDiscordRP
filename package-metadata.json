@@ -1,1 +1,0 @@
-{ "description": "Discord Rich Presence implementation for Sublime Text", "version": "1.0.0", "dependencies": [], "sublime_text": "*", "platforms": ["*"], "url": "https://snazzah-is.cool" }
