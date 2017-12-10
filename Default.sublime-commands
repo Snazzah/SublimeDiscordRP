@@ -1,0 +1,10 @@
+[
+	{
+		"caption": "Discord Rich Presence: Connect to Discord",
+		"command": "discordrp_connect"
+	},
+	{
+		"caption": "Discord Rich Presence: Disconnect",
+		"command": "discordrp_disconnect"
+	}
+]
