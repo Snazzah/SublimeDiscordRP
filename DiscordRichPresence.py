@@ -20,6 +20,10 @@ START_TIME = time()
 LAST_FILE = ''
 LAST_EDIT = 0
 IPC = None
+try: # ST2
+	STRINGINST = basestring
+except NameError: # ST3
+	STRINGINST = str
 
 class DRPLangMatcher(object):
 	NAMES = {
@@ -144,12 +148,6 @@ def encode(op, data):
 	ba_write(packet, data, 8, length)
 	return packet
 
-def decode(packet):
-	op = ri32le(packet, 0)
-	length = ri32le(packet, 4)
-	raw = packet[-length:]
-	return [op, json.loads(str(raw))]
-
 def wi32le(array, value, offset):
 	value = +value
 	offset = offset >> 0
@@ -158,10 +156,6 @@ def wi32le(array, value, offset):
 	array[offset + 2] = (value >> 16)
 	array[offset + 3] = (value >> 24)
 	return offset+4
-
-def ri32le(array, offset):
-    offset = offset >> 0
-    return (array[offset]) | (array[offset + 1] << 8) | (array[offset + 2] << 16) | (array[offset + 3] << 24)
 
 def ba_write(ba, string, offset, length):
 	for i in range(length):
@@ -180,11 +174,11 @@ IPC Connections
 """
 
 def sizehf(num):
-    for unit in ['','K','M','G','T','P','E','Z']:
-        if abs(num) < 1024.0:
-            return "%3.1f%s%s" % (num, unit, 'B')
-        num /= 1024.0
-    return "%.1f%s%s" % (num, 'Yi', 'B')
+	for unit in ['','K','M','G','T','P','E','Z']:
+		if abs(num) < 1024.0:
+			return "%3.1f%s%s" % (num, unit, 'B')
+		num /= 1024.0
+	return "%.1f%s%s" % (num, 'Yi', 'B')
 
 class DRPIPC(object):
 	def __init__(self):
@@ -203,24 +197,25 @@ class DRPIPC(object):
 			self.open = True
 			print('[DiscordRP] Sending Handshake')
 			self.send({ 'v': 1, 'client_id': DISCORD_CLIENT_ID }, 0)
+
+			act = { 'timestamps': { 'start': START_TIME }, 'assets': { 'large_image': 'sublime%s' % ST_VERSION[0], 'large_text': 'Sublime Text %s v%s' % (ST_VERSION[0], ST_VERSION) }, 'instance': False }
+			global STRINGINST
+
+			if isinstance(SETTINGS.get('start_state'), STRINGINST):
+				act['state'] = SETTINGS.get('start_state')
+			else:
+				act['state'] = 'Just launched'
+
+			self.set_activity(act)
 		except OSError as error:
 			self.on_error(error)
 
-	def handle_packet(self, packet):
-		if len(packet) == 0:
-			return self.on_close()
-		data = json.loads(packet[8:])
-		if data['cmd'] == 'DISPATCH' and data.evt == 'READY':
-			print('[DiscordRP] IPC Ready')
-			if view:
-				active_window = sublime.active_window()
-				if active_window:
-					active_view = active_window.active_view()
-					if active_view:
-						handle_packet(active_view)
-
 	def send(self, data, op=1):
-		os.write(self.pipe, encode(op, data))
+		try:
+			os.write(self.pipe, encode(op, data))
+		except OSError:
+			self.on_close()
+			sublime.error_message('DiscordRP\n\nIPC was closed unexpectedly. Either you closed Discord or Discord is having network problems.\n\nIf you have closed Discord please run "Discord Rich Presence: Disconnect" after.\n\nIf you did not mean for this to happen, fix issues (and also check Discord console, Ctrl+Shift+I) and run "Discord Rich Presence: Connect to Discord"')
 
 	def close(self):
 		self.send({}, 2)
@@ -238,9 +233,8 @@ class DRPIPC(object):
 		self._connect(self.ipc_id)
 
 	def on_close(self):
-		if self.open == True:
-			self.open == False
-			print('[DiscordRP] IPC closed')
+		self.open = False
+		print('[DiscordRP] IPC closed')
 
 	def set_activity(self, act):
 		self.send({ 'cmd': 'SET_ACTIVITY', 'args': { 'pid': os.getpid(), 'activity': act }, 'nonce': DRPSnowflake.generate() })
@@ -302,15 +296,12 @@ def handle_activity(view, is_write=False):
 				print('[DiscordRP] Updating activity')
 
 			act = { 'timestamps': { 'start': START_TIME }, 'assets': { 'large_image': 'sublime%s' % ST_VERSION[0], 'large_text': 'Sublime Text %s v%s' % (ST_VERSION[0], ST_VERSION) }, 'instance': False }
-			try: # ST2
-				inst = basestring
-			except NameError: # ST3
-				inst = str
+			global STRINGINST
 
-			if isinstance(SETTINGS.get('details'), inst):
+			if isinstance(SETTINGS.get('details'), STRINGINST):
 				act['details'] = parse_line(SETTINGS.get('details'), view, entity, window, folders)
 
-			if isinstance(SETTINGS.get('state'), inst):
+			if isinstance(SETTINGS.get('state'), STRINGINST):
 				act['state'] = parse_line(SETTINGS.get('state'), view, entity, window, folders)
 			else:
 				act['state'] = "Editing Files"
@@ -341,7 +332,7 @@ def plugin_loaded():
 	SETTINGS = sublime.load_settings(SETTINGS_FILE)
 	print('[DiscordRP] Loaded')
 	IPC = DRPIPC()
-	if not SETTINGS.get('connect_on_startup') == True
+	if not SETTINGS.get('connect_on_startup') == True:
 		return
 	print('[DiscordRP] Starting IPC with client id %s' % DISCORD_CLIENT_ID)
 	IPC.connect()
@@ -390,14 +381,18 @@ class DRPListener(sublime_plugin.EventListener):
 			handle_activity(view)
 
 class DiscordrpConnectCommand(sublime_plugin.ApplicationCommand):
-    def run(self):
-        IPC.connect()
+	def run(self):
+		IPC.connect()
 
 class DiscordrpDisconnectCommand(sublime_plugin.ApplicationCommand):
-    def run(self):
-    	if IPC.open == True:
-        	IPC.close()
+	def run(self):
+		if IPC.open == True:
+			IPC.close()
+
+class DiscordrpRefreshSettingsCommand(sublime_plugin.ApplicationCommand):
+	def run(self):
+		SETTINGS = sublime.load_settings(SETTINGS_FILE)
 
 # need to call plugin_loaded because only ST3 will auto-call it
 if int(ST_VERSION) < 3000:
-    plugin_loaded()
+	plugin_loaded()

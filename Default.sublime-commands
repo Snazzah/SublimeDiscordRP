@@ -6,5 +6,9 @@
 	{
 		"caption": "Discord Rich Presence: Disconnect",
 		"command": "discordrp_disconnect"
+	},
+	{
+		"caption": "Discord Rich Presence: Reload Settings",
+		"command": "discordrp_reload_settings"
 	}
 ]

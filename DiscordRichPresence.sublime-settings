@@ -20,11 +20,14 @@
     // The format the presence details (top line) will be in
     "details": "Editing {file} for Project {project}",
 
-    // The format the presence details (bottom line) will be in
+    // The format the presence state (bottom line) will be in
     "state": "Size: {sizehf}",
 
-	// Whether or not to use the small icon (changes for every language) in the presence. Defaults to true.
-	"small_icon" : true,
+    // The state message when Sublime Text (or the plugin) starts (NOT FORMATTED)
+    "start_state": "Just launched",
+
+    // Whether or not to use the small icon (changes for every language) in the presence. Defaults to true.
+    "small_icon" : true,
 
     // Whether or not to always use the parent folder naem of the file instead of the project it's contained in. Defaults to true.
     "pick_folder_over_project" : true
