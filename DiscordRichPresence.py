@@ -56,6 +56,7 @@ class DRPLangMatcher(object):
 		'.ex': 'Elixir',
 		'.java': 'Java',
 		'.c': 'C',
+		'.ts': 'TypeScript',
 
 		# Non-code related files that can be accessed from sublime
 		'.txt': 'Plain Text',
@@ -108,6 +109,7 @@ class DRPLangMatcher(object):
 		'.ex': 'elixir',
 		'.java': 'java',
 		'.properties': 'java',
+		'.ts': 'typescript',
 		'.sublime-settings': 'json',
 		'.sublime-snippet': 'json',
 		'.sublime-theme': 'json',
@@ -268,7 +270,7 @@ class DRPSnowflake(object):
 		return dec
 
 def get_ipc_path(id=0):
-	if platform.architecture()[0] == '32bit' and platform.system() == 'Windows':
+	if platform.system() == 'Windows':
 		return '\\\\?\\pipe\\discord-ipc-%s' % id
 	def get_env(name):
 		if hasattr(os.environ, name):
