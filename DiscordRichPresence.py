@@ -269,16 +269,18 @@ class DRPSnowflake(object):
 
 		return dec
 
-def get_ipc_path(id=0):
+def get_ipc_path(id_=0):
 	if platform.system() == 'Windows':
-		return '\\\\?\\pipe\\discord-ipc-%s' % id
-	def get_env(name):
-		if hasattr(os.environ, name):
-			return os.environ[name]
-		else:
-			return None
-	prefix = get_env('XDG_RUNTIME_DIR') or get_env('TMPDIR') or get_env('TMP') or get_env('TEMP') or '/tmp'
-	return '%s/discord-ipc-%s' % (prefix.replace(r"\/$", ''), id)
+		return R'\\?\pipe\discord-ipc-%s' % id_
+
+	env_keys = ('XDG_RUNTIME_DIR', 'TMPDIR', 'TMP', 'TEMP')
+	for env_key in env_keys:
+		dir_path = os.environ.get(env_key)
+		if dir_path:
+			break
+	else:
+		dir_path = '/tmp'
+	return os.path.join(dir_path, 'discord-ipc-%s' % id_)
 
 def handle_activity(view, is_write=False):
 	window = view.window()
