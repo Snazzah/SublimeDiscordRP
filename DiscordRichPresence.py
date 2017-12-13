@@ -126,7 +126,7 @@ class DRPIPC(object):
 		self._connect()
 
 	def _connect(self, id=0):
-		path = get_ipc_path(id)
+		path = '\\\\?\\pipe\\discord-ipc-%s' % id
 		self.ipc_id = id
 		print('[DiscordRP] Testing pipe %s' % path)
 		try:
@@ -202,17 +202,6 @@ class DRPSnowflake(object):
 			num = int(math.floor(float(num) / 10))
 
 		return dec
-
-def get_ipc_path(id=0):
-	if platform.system() == 'Windows':
-		return '\\\\?\\pipe\\discord-ipc-%s' % id
-	def get_env(name):
-		if hasattr(os.environ, name):
-			return os.environ[name]
-		else:
-			return None
-	prefix = get_env('XDG_RUNTIME_DIR') or get_env('TMPDIR') or get_env('TMP') or get_env('TEMP') or '/tmp'
-	return '%s/discord-ipc-%s' % (prefix.replace(r"\/$", ''), id)
 
 def handle_activity(view, is_write=False):
 	window = view.window()
