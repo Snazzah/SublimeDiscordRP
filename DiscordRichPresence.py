@@ -123,7 +123,15 @@ def handle_activity(view, is_write=False):
         act['assets']['small_image'] = get_icon(extension)
         act['assets']['small_text'] = language
 
-    ipc.set_activity(act)
+    try:
+        ipc.set_activity(act)
+    except OSError as e:
+        sublime.error_message("[DiscordRP] Sending activity failed."
+                              "\n\nYou have been disconnected from your Discord instance."
+                              " Run 'Discord Rich Presence: Connect to Discord'"
+                              " after you restarted your Discord client."
+                              "\n\nError: {}".format(e))
+        disconnect()
 
 
 def get_project_name(window, current_file):
@@ -173,29 +181,46 @@ class DRPListener(sublime_plugin.EventListener):
             handle_activity(view)
 
 
+def connect():
+    global ipc
+    if not ipc:
+        try:
+            ipc = discord_ipc.DiscordIpcClient.for_platform(DISCORD_CLIENT_ID)
+        except OSError:
+            sublime.error_message("[DiscordRP] Unable to connect to Discord."
+                                  "\n\nPlease verify that it is running."
+                                  " Run 'Discord Rich Presence: Connect to Discord'"
+                                  " to try again.")
+
+
+def disconnect():
+    global ipc
+    if ipc:
+        try:
+            ipc.close()
+        except OSError:
+            pass
+        ipc = None
+
+
 class DiscordrpConnectCommand(sublime_plugin.ApplicationCommand):
     def run(self):
-        global ipc
-        ipc = discord_ipc.DiscordIpcClient.for_platform()
+        connect()
 
 
 class DiscordrpDisconnectCommand(sublime_plugin.ApplicationCommand):
     def run(self):
-        global ipc
-        if ipc:
-            ipc.close()
-            ipc = None
+        disconnect()
 
 
 def plugin_loaded():
-    global ipc, settings
+    global settings
     settings = sublime.load_settings(SETTINGS_FILE)
     if settings.get('connect_on_startup'):
-        ipc = discord_ipc.DiscordIpcClient.for_platform(DISCORD_CLIENT_ID)
+        connect()
 
 
 def plugin_unloaded():
-    global ipc
-    if ipc:
-        ipc.close()
+    disconnect()
+
         ipc = None
