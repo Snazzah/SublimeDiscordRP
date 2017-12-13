@@ -3,6 +3,8 @@
 # * https://github.com/devsnek/discord-rpc/tree/master/example/main.js
 # * https://github.com/discordapp/discord-rpc/tree/master/documentation/hard-mode.md
 # * https://github.com/discordapp/discord-rpc/tree/master/src
+# * https://discordapp.com/developers/docs/rich-presence/how-to#updating-presence-update-presence-payload-fields
+
 from abc import ABCMeta, abstractmethod
 import json
 import logging
