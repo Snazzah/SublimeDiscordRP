@@ -5,10 +5,11 @@
     // Whether or not to connect to Discord on startup. Defaults to true.
     "connect_on_startup": true,
 
-    // Whether not to have verbose logs. Defaults to false.
-    "debug": false,
+    // Specify log level. Valid are "ERROR", "WARNING", "INFO", "DEBUG".
+    "log_level": "WARNING",
 
-    // The format the presence details will be in
+    // The format the presence details will be in.
+    //
     //   {file} - The file name (Ex. index.js)
     //   {extension} - The file extension (Ex. js)
     //   {lang} - The language of the file, else reverts to Unknown (Ex. JavaScript)
@@ -29,6 +30,10 @@
     // Whether or not to use the small icon (changes for every language) in the presence. Defaults to true.
     "small_icon" : true,
 
-    // Whether or not to always use the parent folder naem of the file instead of the project it's contained in. Defaults to true.
-    "pick_folder_over_project" : true
+    // Defines the order of name sources that should be used for the project name in format stings, if available.
+    //
+    //   "project_file_name" - The name of the .sublime-project file.
+    //   "project_folder_name" - The name of the folder in the project that the file being edited resides in.
+    //   "folder_name" - The name of the folder containing the file being edited.
+    "project_name": ["project_file_name", "project_folder_name", "folder_name"]
 }

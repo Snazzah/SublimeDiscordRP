@@ -89,11 +89,19 @@ def handle_activity(view, is_write=False):
     if last_file == entity and time.time() - last_edit < 59 and not is_write:
         return
 
-    folders = window.folders()
     extension = os.path.splitext(entity)[1]
+    language = os.path.splitext(os.path.basename(view.settings().get('syntax')))[0]
+    format_dict = dict(
+        file=os.path.basename(entity),
+        extension=extension,
+        lang=language,
+        project=get_project_name(window, entity),
+        size=view.size(),
+        sizehf=sizehf(view.size()),
+        folders=len(window.folders()),
+    )
     last_file = entity
     last_edit = time.time()
-    language = os.path.splitext(os.path.basename(view.settings().get('syntax')))[0]
     logger.info('Updating activity')
 
     act = {'timestamps': {'start': start_time},
@@ -103,11 +111,11 @@ def handle_activity(view, is_write=False):
 
     details_format = settings.get('details')
     if details_format:
-        act['details'] = format_line(details_format, view, entity, language, folders)
+        act['details'] = details_format.format(**format_dict)
 
     state_format = settings.get('state')
     if state_format:
-        act['state'] = format_line(state_format, view, entity, language, folders)
+        act['state'] = state_format.format(**format_dict)
     else:
         act['state'] = "Editing Files"
 
@@ -118,41 +126,31 @@ def handle_activity(view, is_write=False):
     ipc.set_activity(act)
 
 
-def format_line(string, view, entity, language, folders):
-    extension = os.path.splitext(entity)[1]
-    return string.format(
-        file=os.path.basename(entity),
-        extension=extension,
-        lang=language,
-        project=find_project_from_folders(folders, entity),
-        size=view.size(),
-        sizehf=sizehf(view.size()),
-        folders=len(folders)
-    )
+def get_project_name(window, current_file):
+    sources = settings.get("project_name")
+    for source in sources:
+        if source == "project_folder_name":
+            folder = find_folder_containing_file(window.folders(), current_file)
+            if folder:
+                return os.path.basename(folder)
+        elif source == "project_file_name":
+            project_file_path = window.project_file_name()
+            if project_file_path:
+                return os.path.basename(os.path.dirname(current_file))
+        elif source == "folder_name":
+            return os.path.basename(os.path.dirname(current_file))
+        else:
+            logger.error("Unknown source for `project_name` setting: %r", source)
+
+    return "No project"
 
 
 def find_folder_containing_file(folders, current_file):
-    parent_folder = None
-    current_folder = current_file
-    while True:
-        for folder in folders:
-            if os.path.realpath(os.path.dirname(current_folder)) == os.path.realpath(folder):
-                parent_folder = folder
-                break
-        if parent_folder is not None:
-            break
-        if not current_folder or os.path.dirname(current_folder) == current_folder:
-            break
-        current_folder = os.path.dirname(current_folder)
-
-    return parent_folder
-
-
-def find_project_from_folders(folders, current_file):
-    folder = find_folder_containing_file(folders, current_file)
-    return (os.path.basename(folder)
-            if folder and not settings.get('pick_folder_over_project')
-            else os.path.basename(os.path.dirname(current_file)))
+    for folder in folders:
+        real_folder = os.path.realpath(folder)
+        if os.path.realpath(current_file).startswith(real_folder):
+            return folder
+    return None
 
 
 def is_view_active(view):
