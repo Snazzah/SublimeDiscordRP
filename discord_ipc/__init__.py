@@ -129,7 +129,7 @@ class DiscordIpcClient(metaclass=ABCMeta):
             'cmd': 'SET_ACTIVITY',
             'args': {'pid': os.getpid(),
                      'activity': act},
-            'nonce': uuid.uuid4()
+            'nonce': str(uuid.uuid4())
         }
         self.send(data)
 
