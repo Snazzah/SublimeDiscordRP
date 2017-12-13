@@ -217,7 +217,7 @@ def disconnect():
         # Remove detailed data before closing connection.
         # Discord will detect when the pid we passed earlier doesn't exist anymore.
         act = base_activity()
-        act['details'] =  "Client Disconnected"
+        act['details'] = "Client Disconnected"
         try:
             ipc.set_activity(act)
             ipc.close()
