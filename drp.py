@@ -190,25 +190,28 @@ class DRPListener(sublime_plugin.EventListener):
 
 def connect():
     global ipc
-    if not ipc:
-        try:
-            ipc = discord_ipc.DiscordIpcClient.for_platform(DISCORD_CLIENT_ID)
-        except OSError:
-            sublime.error_message("[DiscordRP] Unable to connect to Discord."
-                                  "\n\nPlease verify that it is running."
-                                  " Run 'Discord Rich Presence: Connect to Discord'"
-                                  " to try again.")
-            return
+    if ipc:
+        logger.error("Already connected")
+        return
 
-        try:
-            ipc.set_activity(base_activity())
-        except OSError as e:
-            sublime.error_message("[DiscordRP] Sending activity failed."
-                                  "\n\nYou have been disconnected from your Discord instance."
-                                  " Run 'Discord Rich Presence: Connect to Discord'"
-                                  " after you restarted your Discord client."
-                                  "\n\nError: {}".format(e))
-            disconnect()
+    try:
+        ipc = discord_ipc.DiscordIpcClient.for_platform(DISCORD_CLIENT_ID)
+    except OSError:
+        sublime.error_message("[DiscordRP] Unable to connect to Discord."
+                              "\n\nPlease verify that it is running."
+                              " Run 'Discord Rich Presence: Connect to Discord'"
+                              " to try again.")
+        return
+
+    try:
+        ipc.set_activity(base_activity())
+    except OSError as e:
+        sublime.error_message("[DiscordRP] Sending activity failed."
+                              "\n\nYou have been disconnected from your Discord instance."
+                              " Run 'Discord Rich Presence: Connect to Discord'"
+                              " after you restarted your Discord client."
+                              "\n\nError: {}".format(e))
+        disconnect()
 
 
 def disconnect():
@@ -227,11 +230,29 @@ def disconnect():
 
 
 class DiscordrpConnectCommand(sublime_plugin.ApplicationCommand):
+
+    def is_enabled(self):
+        return not bool(ipc)
+
     def run(self):
         connect()
 
 
+class DiscordrpReconnectCommand(sublime_plugin.ApplicationCommand):
+
+    def is_enabled(self):
+        return bool(ipc)
+
+    def run(self):
+        disconnect()
+        connect()
+
+
 class DiscordrpDisconnectCommand(sublime_plugin.ApplicationCommand):
+
+    def is_enabled(self):
+        return bool(ipc)
+
     def run(self):
         disconnect()
 

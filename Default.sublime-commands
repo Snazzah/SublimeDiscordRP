@@ -12,6 +12,10 @@
 		"command": "discordrp_connect"
 	},
 	{
+		"caption": "Discord Rich Presence: Reconnect to Discord",
+		"command": "discordrp_reconnect"
+	},
+	{
 		"caption": "Discord Rich Presence: Disconnect",
 		"command": "discordrp_disconnect"
 	}
