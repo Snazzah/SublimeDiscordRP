@@ -10,14 +10,20 @@ from . import discord_ipc
 SETTINGS_FILE = 'DiscordRichPresence.sublime-settings'
 settings = {}
 DISCORD_CLIENT_ID = '389368374645227520'
-ST_VERSION = str(sublime.version())
-start_time = time.time()
+
+logger = logging.getLogger(__name__)
 
 last_file = ''
 last_edit = 0
 ipc = None
 
-logger = logging.getLogger(__name__)
+start_time = time.time()
+base_activity = {
+    'timestamps': {'start': start_time},
+    'assets': {'large_image': 'sublime3',
+               'large_text': 'Sublime Text 3 v%s' % (sublime.version())},
+    'instance': False
+}
 
 
 # TODO base these on base scope name
@@ -89,6 +95,8 @@ def handle_activity(view, is_write=False):
     if last_file == entity and time.time() - last_edit < 59 and not is_write:
         return
 
+    logger.info('Updating activity')
+
     extension = os.path.splitext(entity)[1]
     language = os.path.splitext(os.path.basename(view.settings().get('syntax')))[0]
     format_dict = dict(
@@ -102,12 +110,8 @@ def handle_activity(view, is_write=False):
     )
     last_file = entity
     last_edit = time.time()
-    logger.info('Updating activity')
 
-    act = {'timestamps': {'start': start_time},
-           'assets': {'large_image': 'sublime3',
-                      'large_text': 'Sublime Text 3 v%s' % (sublime.version())},
-           'instance': False}
+    act = base_activity.copy()
 
     details_format = settings.get('details')
     if details_format:
@@ -196,7 +200,12 @@ def connect():
 def disconnect():
     global ipc
     if ipc:
+        # Remove detailed data before closing connection.
+        # Discord will detect when the pid we passed earlier doesn't exist anymore.
+        act = base_activity.copy()
+        act['details'] =  "Client Disconnected"
         try:
+            ipc.set_activity(act)
             ipc.close()
         except OSError:
             pass
@@ -222,5 +231,3 @@ def plugin_loaded():
 
 def plugin_unloaded():
     disconnect()
-
-        ipc = None
