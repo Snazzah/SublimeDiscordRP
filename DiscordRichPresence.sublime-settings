@@ -12,10 +12,10 @@
     //
     //   {file} - The file name (Ex. index.js)
     //   {extension} - The file extension (Ex. js)
-    //   {lang} - The language of the file, else reverts to Unknown (Ex. JavaScript)
+    //   {lang} - The language of the file (Ex. JavaScript)
     //   {size} - The size of the file
     //   {sizehf} - The human friendly size of the file
-    //   {project} - The project name (or folder name) that the file is contained in
+    //   {project} - The project name (or folder name) that the file is contained in. See `project_name` setting.
     //   {folders} - The number of folders open
 
     // The format the presence details (top line) will be in
