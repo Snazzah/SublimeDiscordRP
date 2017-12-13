@@ -20,118 +20,53 @@ ipc = None
 logger = logging.getLogger(__name__)
 
 
-class DRPLangMatcher(object):
-    # TODO base these on base scope name
-    NAMES = {
-        '.js': 'JavaScript',
-        '.py': 'Python',
-        '.lua': 'Lua',
-        '.rb': 'Ruby',
-        '.gemspec': 'Ruby Gem Specifications',
-        '.cr': 'Crystal',
-        '.css': 'CSS',
-        '.html': 'HTML',
-        '.htm': 'HTML',
-        '.shtml': 'HTML',
-        '.xhtml': 'HTML',
-        '.properties': 'Java Properties',
-        '.md': 'Markdown',
-        '.mdown': 'Markdown',
-        '.markdown': 'Markdown',
-        '.markdn': 'Markdown',
-        '.adoc': 'AsciiDoc',
-        '.cs': 'C#',
-        '.csproj': 'C# Project',
-        '.cpp': 'C++',
-        '.php': 'PHP',
-        '.php3': 'PHP',
-        '.go': 'Go',
-        '.d': 'D',
-        '.json': 'JSON',
-        '.exs': 'Elixir',
-        '.ex': 'Elixir',
-        '.java': 'Java',
-        '.c': 'C',
-        '.ts': 'TypeScript',
+# TODO base these on base scope name
+EXT_ICON_MAP = {
+    '.js': 'javascript',
+    '.py': 'python',
+    '.lua': 'lua',
+    '.rb': 'ruby',
+    '.gemspec': 'ruby',
+    '.cr': 'crystal',
+    '.css': 'css',
+    '.html': 'html',
+    '.htm': 'html',
+    '.shtml': 'html',
+    '.xhtml': 'html',
+    '.md': 'markdown',
+    '.mdown': 'markdown',
+    '.markdown': 'markdown',
+    '.markdn': 'markdown',
+    '.cs': 'cs',
+    '.csproj': 'cs',
+    '.cpp': 'cpp',
+    '.php': 'php',
+    '.php3': 'php',
+    '.go': 'go',
+    '.d': 'd',
+    '.c': 'c',
+    '.json': 'json',
+    '.exs': 'elixir',
+    '.ex': 'elixir',
+    '.java': 'java',
+    '.properties': 'java',
+    '.ts': 'typescript',
+    '.sublime-settings': 'json',
+    '.sublime-snippet': 'json',
+    '.sublime-theme': 'json',
+    '.sublime-menu': 'json',
+    '.sublime-commands': 'json',
+    '.sublime-keymap': 'json',
+    '.sublime-mousemap': 'json',
+    '.sublime-build': 'json',
+    '.sublime-macro': 'json',
+    '.sublime-completions': 'json',
+    '.sublime-project': 'json'
+}
 
-        # Non-code related files that can be accessed from sublime
-        '.txt': 'Plain Text',
-        '.png': 'Portable Network Graphic (PNG)',
-        '.jpg': 'JPEG Image',
-        '.jpeg': 'JPEG Image',
-        '.bmp': 'Bitmap Image File',
-        '.svg': 'Scalable Vector Graphics (SVG)',
-        '.yaml': 'YAML Document',
-        '.yml': 'YAML Document',
-        '.sublime-settings': 'Sublime Text settings',
-        '.suettings': 'json',
-        '.sublime-snippet': 'json',
-        '.sublime-theme': 'json',
-        '.sublime-menu': 'json',
-        '.sublime-commands': 'json',
-        '.sublime-keymap': 'json',
-        '.sublime-mousemap': 'json',
-        '.sublime-build': 'json',
-        '.sublime-macro': 'json',
-        '.sublime-completions': 'json',
-        '.sublime-project': 'json'
-    }
-    ICONS = {
-        '.js': 'javascript',
-        '.py': 'python',
-        '.lua': 'lua',
-        '.rb': 'ruby',
-        '.gemspec': 'ruby',
-        '.cr': 'crystal',
-        '.css': 'css',
-        '.html': 'html',
-        '.htm': 'html',
-        '.shtml': 'html',
-        '.xhtml': 'html',
-        '.md': 'markdown',
-        '.mdown': 'markdown',
-        '.markdown': 'markdown',
-        '.markdn': 'markdown',
-        '.cs': 'cs',
-        '.csproj': 'cs',
-        '.cpp': 'cpp',
-        '.php': 'php',
-        '.php3': 'php',
-        '.go': 'go',
-        '.d': 'd',
-        '.c': 'c',
-        '.json': 'json',
-        '.exs': 'elixir',
-        '.ex': 'elixir',
-        '.java': 'java',
-        '.properties': 'java',
-        '.ts': 'typescript',
-        '.sublime-settings': 'json',
-        '.sublime-snippet': 'json',
-        '.sublime-theme': 'json',
-        '.sublime-menu': 'json',
-        '.sublime-commands': 'json',
-        '.sublime-keymap': 'json',
-        '.sublime-mousemap': 'json',
-        '.sublime-build': 'json',
-        '.sublime-macro': 'json',
-        '.sublime-completions': 'json',
-        '.sublime-project': 'json'
-    }
 
-    @classmethod
-    def get_name(cls, ext):
-        try:
-            return cls.NAMES[ext]
-        except KeyError:
-            return ext.upper()
-
-    @classmethod
-    def get_icon(cls, ext):
-        try:
-            return 'lang-%s' % cls.ICONS[ext]
-        except KeyError:
-            return 'lang-unknown'
+def get_icon(ext):
+    return 'lang-%s' % EXT_ICON_MAP.get(ext, "unknown")
 
 
 def sizehf(num):
@@ -158,6 +93,7 @@ def handle_activity(view, is_write=False):
     extension = os.path.splitext(entity)[1]
     last_file = entity
     last_edit = time.time()
+    language = os.path.splitext(os.path.basename(view.settings().get('syntax')))[0]
     logger.info('Updating activity')
 
     act = {'timestamps': {'start': start_time},
@@ -167,27 +103,27 @@ def handle_activity(view, is_write=False):
 
     details_format = settings.get('details')
     if details_format:
-        act['details'] = format_line(details_format, view, entity, folders)
+        act['details'] = format_line(details_format, view, entity, language, folders)
 
     state_format = settings.get('state')
     if state_format:
-        act['state'] = format_line(state_format, view, entity, folders)
+        act['state'] = format_line(state_format, view, entity, language, folders)
     else:
         act['state'] = "Editing Files"
 
     if settings.get('small_icon'):
-        act['assets']['small_image'] = DRPLangMatcher.get_icon(extension)
-        act['assets']['small_text'] = DRPLangMatcher.get_name(extension)
+        act['assets']['small_image'] = get_icon(extension)
+        act['assets']['small_text'] = language
 
     ipc.set_activity(act)
 
 
-def format_line(string, view, entity, folders):
+def format_line(string, view, entity, language, folders):
     extension = os.path.splitext(entity)[1]
     return string.format(
         file=os.path.basename(entity),
         extension=extension,
-        lang=DRPLangMatcher.get_name(extension),
+        lang=language,
         project=find_project_from_folders(folders, entity),
         size=view.size(),
         sizehf=sizehf(view.size()),
