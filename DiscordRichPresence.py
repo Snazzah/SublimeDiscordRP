@@ -18,12 +18,17 @@ last_edit = 0
 ipc = None
 
 start_time = time.time()
-base_activity = {
-    'timestamps': {'start': start_time},
-    'assets': {'large_image': 'sublime3',
-               'large_text': 'Sublime Text 3 v%s' % (sublime.version())},
-    'instance': False
-}
+
+
+def base_activity():
+    activity = {
+        'assets': {'large_image': 'sublime3',
+                   'large_text': 'Sublime Text 3 v%s' % (sublime.version())},
+        'instance': False
+    }
+    if settings.get('send_start_timestamp'):
+        activity['timestamps'] = {'start': start_time}
+    return activity
 
 
 # TODO base these on base scope name
@@ -111,7 +116,7 @@ def handle_activity(view, is_write=False):
     last_file = entity
     last_edit = time.time()
 
-    act = base_activity.copy()
+    act = base_activity()
 
     details_format = settings.get('details')
     if details_format:
@@ -198,7 +203,7 @@ def connect():
             return
 
         try:
-            ipc.set_activity(base_activity)
+            ipc.set_activity(base_activity())
         except OSError as e:
             sublime.error_message("[DiscordRP] Sending activity failed."
                                   "\n\nYou have been disconnected from your Discord instance."
@@ -213,7 +218,7 @@ def disconnect():
     if ipc:
         # Remove detailed data before closing connection.
         # Discord will detect when the pid we passed earlier doesn't exist anymore.
-        act = base_activity.copy()
+        act = base_activity()
         act['details'] =  "Client Disconnected"
         try:
             ipc.set_activity(act)

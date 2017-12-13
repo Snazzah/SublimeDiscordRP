@@ -25,6 +25,9 @@
     // The state message when Sublime Text (or the plugin) starts (NOT FORMATTED)
     "start_state": "Just launched",
 
+    // Whether or not a timestamp for ST's start time should be included.
+    "send_start_timestamp": true,
+
     // Whether or not to use the small icon (changes for every language) in the presence. Defaults to true.
     "small_icon" : true,
 
