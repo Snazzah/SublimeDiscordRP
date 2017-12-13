@@ -1,6 +1,4 @@
 // DiscordRP Default Settings
-// This settings file will be overwritten when upgrading.
-
 {
     // Whether or not to connect to Discord on startup. Defaults to true.
     "connect_on_startup": true,
