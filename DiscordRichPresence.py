@@ -180,10 +180,10 @@ def is_view_active(view):
 
 class DRPListener(sublime_plugin.EventListener):
 
-    def on_post_save(self, view):
+    def on_post_save_async(self, view):
         handle_activity(view, is_write=True)
 
-    def on_modified(self, view):
+    def on_modified_async(self, view):
         if is_view_active(view):
             handle_activity(view)
 
