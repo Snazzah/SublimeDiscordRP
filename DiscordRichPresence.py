@@ -20,66 +20,8 @@ START_TIME = time()
 LAST_FILE = ''
 LAST_EDIT = 0
 IPC = None
-try: # ST2
-	STRINGINST = basestring
-except NameError: # ST3
-	STRINGINST = str
 
 class DRPLangMatcher(object):
-	NAMES = {
-		'.js': 'JavaScript',
-		'.py': 'Python',
-		'.lua': 'Lua',
-		'.rb': 'Ruby',
-		'.gemspec': 'Ruby Gem Specifications',
-		'.cr': 'Crystal',
-		'.css': 'CSS',
-		'.html': 'HTML',
-		'.htm': 'HTML',
-		'.shtml': 'HTML',
-		'.xhtml': 'HTML',
-		'.properties': 'Java Properties',
-		'.md': 'Markdown',
-		'.mdown': 'Markdown',
-		'.markdown': 'Markdown',
-		'.markdn': 'Markdown',
-		'.adoc': 'AsciiDoc',
-		'.cs': 'C#',
-		'.csproj': 'C# Project',
-		'.cpp': 'C++',
-		'.php': 'PHP',
-		'.php3': 'PHP',
-		'.go': 'Go',
-		'.d': 'D',
-		'.json': 'JSON',
-		'.exs': 'Elixir',
-		'.ex': 'Elixir',
-		'.java': 'Java',
-		'.c': 'C',
-		'.ts': 'TypeScript',
-
-		# Non-code related files that can be accessed from sublime
-		'.txt': 'Plain Text',
-		'.png': 'Portable Network Graphic (PNG)',
-		'.jpg': 'JPEG Image',
-		'.jpeg': 'JPEG Image',
-		'.bmp': 'Bitmap Image File',
-		'.svg': 'Scalable Vector Graphics (SVG)',
-		'.yaml': 'YAML Document',
-		'.yml': 'YAML Document',
-		'.sublime-settings': 'Sublime Text Settings',
-		'.sublime-snippet': 'Sublime Text Snippet',
-		'.sublime-theme': 'Sublime Text Theme',
-		'.sublime-menu': 'Sublime Text Menu',
-		'.sublime-commands': 'Sublime Text Commands',
-		'.sublime-keymap': 'Sublime Text Key Map',
-		'.sublime-mousemap': 'Sublime Text Mouse Map',
-		'.sublime-build': 'Sublime Text Build',
-		'.sublime-macro': 'Sublime Text Macro',
-		'.sublime-completions': 'Sublime Text Completions',
-		'.sublime-project': 'Sublime Text Project',
-		'.tmtheme': 'TextMate Theme',
-	}
 	ICONS = {
 		'.js': 'javascript',
 		'.py': 'python',
@@ -122,13 +64,6 @@ class DRPLangMatcher(object):
 		'.sublime-completions': 'json',
 		'.sublime-project': 'json'
 	}
-
-	@staticmethod
-	def get_name(ext):
-		try:
-			return DRPLangMatcher.NAMES[ext]
-		except KeyError:
-			return ext.upper()
 
 	@staticmethod
 	def get_icon(ext):
@@ -201,9 +136,8 @@ class DRPIPC(object):
 			self.send({ 'v': 1, 'client_id': DISCORD_CLIENT_ID }, 0)
 
 			act = { 'timestamps': { 'start': START_TIME }, 'assets': { 'large_image': 'sublime%s' % ST_VERSION[0], 'large_text': 'Sublime Text %s v%s' % (ST_VERSION[0], ST_VERSION) }, 'instance': False }
-			global STRINGINST
 
-			if isinstance(SETTINGS.get('start_state'), STRINGINST):
+			if isinstance(SETTINGS.get('start_state'), basestring):
 				act['state'] = SETTINGS.get('start_state')
 			else:
 				act['state'] = 'Just launched'
@@ -298,19 +232,18 @@ def handle_activity(view, is_write=False):
 				print('[DiscordRP] Updating activity')
 
 			act = { 'timestamps': { 'start': START_TIME }, 'assets': { 'large_image': 'sublime%s' % ST_VERSION[0], 'large_text': 'Sublime Text %s v%s' % (ST_VERSION[0], ST_VERSION) }, 'instance': False }
-			global STRINGINST
 
-			if isinstance(SETTINGS.get('details'), STRINGINST):
+			if isinstance(SETTINGS.get('details'), basestring):
 				act['details'] = parse_line(SETTINGS.get('details'), view, entity, window, folders)
 
-			if isinstance(SETTINGS.get('state'), STRINGINST):
+			if isinstance(SETTINGS.get('state'), basestring):
 				act['state'] = parse_line(SETTINGS.get('state'), view, entity, window, folders)
 			else:
 				act['state'] = "Editing Files"
 
 			if SETTINGS.get('small_icon') == True:
 				act['assets']['small_image'] = DRPLangMatcher.get_icon(extension)
-				act['assets']['small_text'] = DRPLangMatcher.get_name(extension)
+				act['assets']['small_text'] = os.path.splitext(os.path.basename(view.settings().get('syntax')))[0]
 
 			IPC.set_activity(act)
 
@@ -319,7 +252,7 @@ def parse_line(string, view, entity, window, folders):
 	return string.format(
 		file = os.path.basename(entity),
 		extension = extension,
-		lang = DRPLangMatcher.get_name(extension),
+		lang = os.path.splitext(os.path.basename(view.settings().get('syntax')))[0],
 		project = find_project_from_folders(folders, entity),
 		size = view.size(),
 		sizehf = sizehf(view.size()),
@@ -327,17 +260,6 @@ def parse_line(string, view, entity, window, folders):
 	)
 
 def plugin_loaded():
-	global IPC
-	global DISCORD_CLIENT_ID
-	global START_TIME
-	global SETTINGS
-	SETTINGS = sublime.load_settings(SETTINGS_FILE)
-	print('[DiscordRP] Loaded')
-	IPC = DRPIPC()
-	if not SETTINGS.get('connect_on_startup') == True:
-		return
-	print('[DiscordRP] Starting IPC with client id %s' % DISCORD_CLIENT_ID)
-	IPC.connect()
 
 def plugin_unloaded():
 	print('[DiscordRP] Unloading')
@@ -395,6 +317,12 @@ class DiscordrpRefreshSettingsCommand(sublime_plugin.ApplicationCommand):
 	def run(self):
 		SETTINGS = sublime.load_settings(SETTINGS_FILE)
 
-# need to call plugin_loaded because only ST3 will auto-call it
-if int(ST_VERSION) < 3000:
-	plugin_loaded()
+""" plugin_loaded() """
+
+SETTINGS = sublime.load_settings(SETTINGS_FILE)
+print('[DiscordRP] Loaded')
+IPC = DRPIPC()
+if not SETTINGS.get('connect_on_startup') == True:
+	return
+print('[DiscordRP] Starting IPC with client id %s' % DISCORD_CLIENT_ID)
+IPC.connect()
