@@ -1,3 +1,5 @@
+# This file is currently unused
+
 import time
 
 DISCORD_EPOCH = 1420070400000

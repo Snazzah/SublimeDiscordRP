@@ -10,8 +10,7 @@ import os
 import socket
 import sys
 import struct
-
-from . import snowflake
+import uuid
 
 
 OP_HANDSHAKE = 0
@@ -130,7 +129,7 @@ class DiscordIpcClient(metaclass=ABCMeta):
             'cmd': 'SET_ACTIVITY',
             'args': {'pid': os.getpid(),
                      'activity': act},
-            'nonce': snowflake.generate()
+            'nonce': uuid.uuid4()
         }
         self.send(data)
 
