@@ -154,6 +154,11 @@ def get_project_name(window, current_file):
                 return os.path.basename(os.path.dirname(current_file))
         elif source == "folder_name":
             return os.path.basename(os.path.dirname(current_file))
+        elif source == "folder_name_ignore_srcdir":
+            if os.path.basename(os.path.dirname(current_file)) == "src":
+                return os.path.basename(os.path.abspath(os.path.join(os.path.dirname(current_file), os.pardir)))
+            else:
+                return os.path.basename(os.path.dirname(current_file))
         else:
             logger.error("Unknown source for `project_name` setting: %r", source)
 
