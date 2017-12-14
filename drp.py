@@ -129,6 +129,11 @@ def handle_activity(view, is_write=False):
     if settings.get('small_icon'):
         act['assets']['small_image'] = get_icon(extension)
         act['assets']['small_text'] = language
+    elif settings.get('reverse_icons'):
+        act['assets']['small_image'] = act['assets']['large_image']
+        act['assets']['small_text'] = act['assets']['large_text']
+        act['assets']['large_image'] = get_icon(extension)
+        act['assets']['large_text'] = language
 
     try:
         ipc.set_activity(act)
