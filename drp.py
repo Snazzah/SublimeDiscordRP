@@ -7,7 +7,7 @@ import sublime_plugin
 
 from . import discord_ipc
 
-SETTINGS_FILE = 'DiscordRichPresence.sublime-settings'
+_FILE = 'DiscordRichPresence.sublime-settings'
 settings = {}
 DISCORD_CLIENT_ID = '389368374645227520'
 
@@ -72,7 +72,9 @@ EXT_ICON_MAP = {
     '.sublime-build': 'json',
     '.sublime-macro': 'json',
     '.sublime-completions': 'json',
-    '.sublime-project': 'json'
+    '.sublime-project': 'json',
+    '.rs': 'rust',
+    '.toml': 'toml'
 }
 
 
@@ -97,7 +99,7 @@ def handle_activity(view, is_write=False):
     # TODO refactor these globals
     global last_file
     global last_edit
-    if last_file == entity and time.time() - last_edit < 59 and not is_write:
+    if last_file == entity and time.time() - last_edit < 15 and not is_write:
         return
 
     logger.info('Updating activity')
