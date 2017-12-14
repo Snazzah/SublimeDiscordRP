@@ -7,7 +7,7 @@ import sublime_plugin
 
 from . import discord_ipc
 
-_FILE = 'DiscordRichPresence.sublime-settings'
+SETTINGS_FILE = 'DiscordRichPresence.sublime-settings'
 settings = {}
 DISCORD_CLIENT_ID = '389368374645227520'
 
