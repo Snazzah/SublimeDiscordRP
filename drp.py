@@ -74,7 +74,11 @@ EXT_ICON_MAP = {
     '.sublime-completions': 'json',
     '.sublime-project': 'json',
     '.rs': 'rust',
-    '.toml': 'toml'
+    '.toml': 'toml',
+    '.vue': 'vue',
+    '.scss': 'scss',
+    '.sass': 'sass',
+    '.pug': 'pug'
 }
 
 
