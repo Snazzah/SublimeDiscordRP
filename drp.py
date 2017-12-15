@@ -153,8 +153,6 @@ def get_project_name(window, current_file):
             if project_file_path:
                 return os.path.basename(os.path.dirname(current_file))
         elif source == "folder_name":
-            return os.path.basename(os.path.dirname(current_file))
-        elif source == "folder_name_ignore_srcdir":
             if os.path.basename(os.path.dirname(current_file)) == "src":
                 return os.path.basename(os.path.abspath(os.path.join(os.path.dirname(current_file), os.pardir)))
             else:
