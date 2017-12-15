@@ -151,7 +151,7 @@ def get_project_name(window, current_file):
         elif source == "project_file_name":
             project_file_path = window.project_file_name()
             if project_file_path:
-                return os.path.basename(os.path.dirname(current_file))
+                return os.path.splitext(os.path.basename(project_file_path))[0]
         elif source == "folder_name":
             return os.path.basename(os.path.dirname(current_file))
         else:
