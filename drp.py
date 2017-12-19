@@ -50,6 +50,7 @@ EXT_ICON_MAP = {
     '.markdn': 'markdown',
     '.cs': 'cs',
     '.csproj': 'cs',
+    '.cc': 'cpp',
     '.cpp': 'cpp',
     '.php': 'php',
     '.php3': 'php',
