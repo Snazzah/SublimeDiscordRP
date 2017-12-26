@@ -30,35 +30,46 @@ def base_activity():
         activity['timestamps'] = {'start': start_time}
     return activity
 
+# List of icon names that are also language names.
+AVAILABLES_ICONS = {
+    'c',
+    'crystal',
+    'cs',
+    'css',
+    'd',
+    'elixir',
+    'go',
+    'java',
+    'json',
+    'lua',
+    'php',
+    'python',
+    'ruby',
+    'html',
+}
+
+# Map a scope to a specific icon. The first token of the scope (source or text)
+# has been dropped.
 SCOPE_ICON_MAP = {
-    'source.c': 'c',
-    'source.c++': 'cpp',
-    'source.crystal': 'crystal',
-    'source.cs': 'cs',
-    'source.css': 'css',
-    'source.d': 'd',
-    'source.elixir': 'elixir',
-    'source.go': 'go',
-    'source.java': 'java',
-    'source.java-props': 'java',
-    'source.js': 'javascript',
-    'source.json': 'json',
-    'source.lua': 'lua',
-    'source.php': 'php',
-    'source.python': 'python',
-    'source.ruby': 'ruby',
-    'source.ts': 'typescript',
-    'text.html': 'html',
-    'text.html.markdown': 'markdown',
+    'c++': 'cpp',
+    'java-props': 'java',
+    'js': 'javascript',
+    'ts': 'typescript',
+    'html.markdown': 'markdown',
 }
 
 def get_icon(main_scope):
-    icon = 'unknown'
-    for scope in yield_subscopes(main_scope):
-        if scope in SCOPE_ICON_MAP:
-            icon = SCOPE_ICON_MAP.get(scope)
+    base_scope, sub_scope = main_scope.split('.', 1)
+    icon = 'text' if base_scope == 'text' else 'unknown'
+    for scope in yield_subscopes(sub_scope):
+        if scope in AVAILABLES_ICONS:
+            icon = scope
             break
-    logger.info('Using icon %s for scope %s', icon, main_scope)
+        elif scope in SCOPE_ICON_MAP:
+            icon = SCOPE_ICON_MAP[scope]
+            break
+
+    logger.info('Using icon "%s" for scope "%s"', icon, main_scope)
     return 'lang-%s' % icon
 
 def yield_subscopes(scope):
