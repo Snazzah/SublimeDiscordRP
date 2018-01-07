@@ -73,10 +73,10 @@ def get_icon(main_scope):
     return 'lang-%s' % icon
 
 def yield_subscopes(scope):
-    while scope:
-        yield scope
-        dot_index = scope.rfind('.')
-        scope = None if dot_index < 0 else scope[:dot_index]
+    last_dot = len(scope)
+    while last_dot > 0:
+        yield scope[:last_dot]
+        last_dot = scope[:last_dot].rfind('.')
 
 def sizehf(num):
     for unit in ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z']:
