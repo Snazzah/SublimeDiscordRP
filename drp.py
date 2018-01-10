@@ -71,7 +71,7 @@ def get_icon(main_scope):
             icon = scope
             break
 
-    logger.info('Using icon "%s" for scope "%s"', icon, main_scope)
+    logger.debug('Using icon "%s" for scope "%s"', icon, main_scope)
     return 'lang-%s' % icon
 
 def yield_subscopes(scope):
