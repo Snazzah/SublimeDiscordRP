@@ -10,12 +10,14 @@ from . import discord_ipc
 SETTINGS_FILE = 'DiscordRichPresence.sublime-settings'
 settings = {}
 DISCORD_CLIENT_ID = '389368374645227520'
+RECONNECT_DELAY = 15000
 
 logger = logging.getLogger(__name__)
 
 last_file = ''
 last_edit = 0
 ipc = None
+is_connecting = False
 
 start_time = time.time()
 
@@ -138,12 +140,18 @@ def handle_activity(view, is_write=False):
     try:
         ipc.set_activity(act)
     except OSError as e:
-        sublime.error_message("[DiscordRP] Sending activity failed."
-                              "\n\nYou have been disconnected from your Discord instance."
-                              " Run 'Discord Rich Presence: Connect to Discord'"
-                              " after you restarted your Discord client."
-                              "\n\nError: {}".format(e))
-        disconnect()
+        handle_error(e)
+
+
+def handle_error(exc, retry=True):
+    sublime.active_window().status_message("[DiscordRP] Sending activity failed")
+    logger.error("Sending activity failed. Error: %s", exc)
+    disconnect()
+
+    if retry:
+        global is_connecting
+        is_connecting = True
+        sublime.set_timeout_async(connect_background, 0)
 
 
 def get_project_name(window, current_file):
@@ -185,41 +193,45 @@ def is_view_active(view):
                 return active_view.buffer_id() == view.buffer_id()
     return False
 
-
-class DRPListener(sublime_plugin.EventListener):
-
-    def on_post_save_async(self, view):
-        handle_activity(view, is_write=True)
-
-    def on_modified_async(self, view):
-        if is_view_active(view):
-            handle_activity(view)
-
-
-def connect():
+def connect(silent=False, retry=True):
     global ipc
     if ipc:
         logger.error("Already connected")
-        return
+        return True
 
     try:
         ipc = discord_ipc.DiscordIpcClient.for_platform(DISCORD_CLIENT_ID)
     except OSError:
-        sublime.error_message("[DiscordRP] Unable to connect to Discord."
-                              "\n\nPlease verify that it is running."
-                              " Run 'Discord Rich Presence: Connect to Discord'"
-                              " to try again.")
+        if silent:
+            logger.info("Unable to connect to Discord client")
+        else:
+            sublime.error_message("[DiscordRP] Unable to connect to Discord client."
+                                  "\n\nPlease verify that it is running."
+                                  " Run 'Discord Rich Presence: Connect to Discord'"
+                                  " to try again.")
+        if retry:
+            global is_connecting
+            is_connecting = True
+            sublime.set_timeout_async(connect_background, RECONNECT_DELAY)
         return
 
     try:
         ipc.set_activity(base_activity())
     except OSError as e:
-        sublime.error_message("[DiscordRP] Sending activity failed."
-                              "\n\nYou have been disconnected from your Discord instance."
-                              " Run 'Discord Rich Presence: Connect to Discord'"
-                              " after you restarted your Discord client."
-                              "\n\nError: {}".format(e))
-        disconnect()
+        handle_error(e, retry=retry)
+        return
+
+    return True
+
+
+def connect_background():
+    if not is_connecting:
+        logger.warning("Automatic connection retry aborted")
+        return
+
+    logger.info("Trying to reconnect to Discord client...")
+    if not connect(silent=True, retry=False):
+        sublime.set_timeout_async(connect_background, RECONNECT_DELAY)
 
 
 def disconnect():
@@ -235,6 +247,16 @@ def disconnect():
         except OSError:
             pass
         ipc = None
+
+
+class DRPListener(sublime_plugin.EventListener):
+
+    def on_post_save_async(self, view):
+        handle_activity(view, is_write=True)
+
+    def on_modified_async(self, view):
+        if is_view_active(view):
+            handle_activity(view)
 
 
 class DiscordrpConnectCommand(sublime_plugin.ApplicationCommand):
@@ -259,17 +281,19 @@ class DiscordrpReconnectCommand(sublime_plugin.ApplicationCommand):
 class DiscordrpDisconnectCommand(sublime_plugin.ApplicationCommand):
 
     def is_enabled(self):
-        return bool(ipc)
+        return bool(ipc) or is_connecting
 
     def run(self):
+        global is_connecting
         disconnect()
+        is_connecting = False
 
 
 def plugin_loaded():
     global settings
     settings = sublime.load_settings(SETTINGS_FILE)
     if settings.get('connect_on_startup'):
-        connect()
+        connect(silent=True)
 
 
 def plugin_unloaded():
