@@ -30,55 +30,53 @@ def base_activity():
         activity['timestamps'] = {'start': start_time}
     return activity
 
-
-# TODO base these on base scope name
-EXT_ICON_MAP = {
-    '.js': 'javascript',
-    '.py': 'python',
-    '.lua': 'lua',
-    '.rb': 'ruby',
-    '.gemspec': 'ruby',
-    '.cr': 'crystal',
-    '.css': 'css',
-    '.html': 'html',
-    '.htm': 'html',
-    '.shtml': 'html',
-    '.xhtml': 'html',
-    '.md': 'markdown',
-    '.mdown': 'markdown',
-    '.markdown': 'markdown',
-    '.markdn': 'markdown',
-    '.cs': 'cs',
-    '.csproj': 'cs',
-    '.cpp': 'cpp',
-    '.php': 'php',
-    '.php3': 'php',
-    '.go': 'go',
-    '.d': 'd',
-    '.c': 'c',
-    '.json': 'json',
-    '.exs': 'elixir',
-    '.ex': 'elixir',
-    '.java': 'java',
-    '.properties': 'java',
-    '.ts': 'typescript',
-    '.sublime-settings': 'json',
-    '.sublime-snippet': 'json',
-    '.sublime-theme': 'json',
-    '.sublime-menu': 'json',
-    '.sublime-commands': 'json',
-    '.sublime-keymap': 'json',
-    '.sublime-mousemap': 'json',
-    '.sublime-build': 'json',
-    '.sublime-macro': 'json',
-    '.sublime-completions': 'json',
-    '.sublime-project': 'json'
+# List of icon names that are also language names.
+AVAILABLES_ICONS = {
+    'c',
+    'crystal',
+    'cs',
+    'css',
+    'd',
+    'elixir',
+    'go',
+    'java',
+    'json',
+    'lua',
+    'php',
+    'python',
+    'ruby',
+    'html',
 }
 
+# Map a scope to a specific icon. The first token of the scope (source or text)
+# has been dropped.
+SCOPE_ICON_MAP = {
+    'c++': 'cpp',
+    'java-props': 'java',
+    'js': 'javascript',
+    'ts': 'typescript',
+    'html.markdown': 'markdown',
+}
 
-def get_icon(ext):
-    return 'lang-%s' % EXT_ICON_MAP.get(ext, "unknown")
+def get_icon(main_scope):
+    base_scope, sub_scope = main_scope.split('.', 1)
+    icon = 'text' if base_scope == 'text' else 'unknown'
+    for scope in yield_subscopes(sub_scope):
+        if scope in AVAILABLES_ICONS:
+            icon = scope
+            break
+        elif scope in SCOPE_ICON_MAP:
+            icon = SCOPE_ICON_MAP[scope]
+            break
 
+    logger.info('Using icon "%s" for scope "%s"', icon, main_scope)
+    return 'lang-%s' % icon
+
+def yield_subscopes(scope):
+    last_dot = len(scope)
+    while last_dot > 0:
+        yield scope[:last_dot]
+        last_dot = scope[:last_dot].rfind('.')
 
 def sizehf(num):
     for unit in ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z']:
@@ -126,13 +124,15 @@ def handle_activity(view, is_write=False):
     if state_format:
         act['state'] = state_format.format(**format_dict)
 
+    main_scope = view.scope_name(0).split()[0]
+    icon = get_icon(main_scope)
     if settings.get('big_icon'):
         act['assets']['small_image'] = act['assets']['large_image']
         act['assets']['small_text'] = act['assets']['large_text']
-        act['assets']['large_image'] = get_icon(extension)
+        act['assets']['large_image'] = icon
         act['assets']['large_text'] = language
     elif settings.get('small_icon'):
-        act['assets']['small_image'] = get_icon(extension)
+        act['assets']['small_image'] = icon
         act['assets']['small_text'] = language
 
     try:
@@ -147,7 +147,7 @@ def handle_activity(view, is_write=False):
 
 
 def get_project_name(window, current_file):
-    sources = settings.get("project_name")
+    sources = settings.get("project_name", [])
     for source in sources:
         if source == "project_folder_name":
             folder = find_folder_containing_file(window.folders(), current_file)
