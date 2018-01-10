@@ -62,11 +62,11 @@ def get_icon(main_scope):
     base_scope, sub_scope = main_scope.split('.', 1)
     icon = 'text' if base_scope == 'text' else 'unknown'
     for scope in yield_subscopes(sub_scope):
-        if scope in AVAILABLES_ICONS:
-            icon = scope
-            break
-        elif scope in SCOPE_ICON_MAP:
+        if scope in SCOPE_ICON_MAP:
             icon = SCOPE_ICON_MAP[scope]
+            break
+        elif scope in AVAILABLES_ICONS:
+            icon = scope
             break
 
     logger.info('Using icon "%s" for scope "%s"', icon, main_scope)
