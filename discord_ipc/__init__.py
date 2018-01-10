@@ -148,7 +148,7 @@ class WinDiscordIpcClient(DiscordIpcClient):
             try:
                 self._f = open(path, "w+b")
             except OSError as e:
-                print("[DiscordRP] failed to open {!r}: {}".format(path, e))
+                logger.error("failed to open {!r}: {}".format(path, e))
             else:
                 break
         else:
@@ -180,7 +180,7 @@ class UnixDiscordIpcClient(DiscordIpcClient):
             try:
                 self._sock.connect(path)
             except OSError as e:
-                print("[DiscordRP] failed to open {!r}: {}".format(path, e))
+                logger.error("failed to open {!r}: {}".format(path, e))
             else:
                 break
         else:
