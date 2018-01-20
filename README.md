@@ -7,6 +7,6 @@ Discord Rich Presence for Sublime Text 3.
 
 ## Preview
 
-|  User Modal  | Popout Modal
+|  User Model  | Popout Model
 | ------------ | ------------------------------------------
 | ![](https://i-need.discord.cards/fc30f4.png) | ![](https://i-need.discord.cards/c408bd.png)
