@@ -48,6 +48,7 @@ AVAILABLES_ICONS = {
     'python',
     'ruby',
     'html',
+    'rust',
 }
 
 # Map a scope to a specific icon. The first token of the scope (source or text)
