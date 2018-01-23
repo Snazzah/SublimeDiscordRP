@@ -105,6 +105,8 @@ def handle_activity(view, is_write=False):
 
     extension = os.path.splitext(entity)[1]
     language = os.path.splitext(os.path.basename(view.settings().get('syntax')))[0]
+    if len(language) < 2:
+        language += ' Syntax'
     format_dict = dict(
         file=os.path.basename(entity),
         extension=extension,
