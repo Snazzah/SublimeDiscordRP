@@ -16,6 +16,8 @@ Discord Rich Presence for Sublime Text 3.
 
 The recommended installation method is to use [Package Control](https://packagecontrol.io/packages/Discord%20Rich%20Presence).
 
+![Animation of installation through Package Control](https://camo.githubusercontent.com/ff3df50a4bad4b83b2072550c1d8cf6f5d55d159/68747470733a2f2f692e696d6775722e636f6d2f737a7475474f572e676966)
+
 If for any reason you want to install the package manually, ensure that the package's folder is named `Discord Rich Presence`.
 
 ## Usage
