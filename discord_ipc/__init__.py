@@ -104,11 +104,11 @@ class DiscordIpcClient(metaclass=ABCMeta):
     def __exit__(self, *_):
         self.close()
 
-    def send_recv(self, data, op=OP_FRAME):
+    def send_recv(self, data, *, op=OP_FRAME):
         self.send(data, op)
         return self.recv()
 
-    def send(self, data, op=OP_FRAME):
+    def send(self, data, *, op=OP_FRAME):
         logger.debug("sending %s", data)
         data_str = json.dumps(data, separators=(',', ':'))
         data_bytes = data_str.encode('utf-8')
