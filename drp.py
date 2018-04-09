@@ -26,7 +26,6 @@ def base_activity():
     activity = {
         'assets': {'large_image': 'sublime3',
                    'large_text': 'Sublime Text 3 v%s' % (sublime.version())},
-        'instance': False
     }
     if settings.get('send_start_timestamp'):
         activity['timestamps'] = {'start': start_time}
@@ -240,12 +239,8 @@ def connect_background():
 def disconnect():
     global ipc
     if ipc:
-        # Remove detailed data before closing connection.
-        # Discord will detect when the pid we passed earlier doesn't exist anymore.
-        act = base_activity()
-        act['details'] = "Client Disconnected"
         try:
-            ipc.set_activity(act)
+            ipc.clear_activity()
             ipc.close()
         except OSError:
             pass
