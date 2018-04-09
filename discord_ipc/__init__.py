@@ -128,11 +128,18 @@ class DiscordIpcClient(metaclass=ABCMeta):
         return op, data
 
     def set_activity(self, act):
-        # act
         data = {
             'cmd': 'SET_ACTIVITY',
             'args': {'pid': os.getpid(),
                      'activity': act},
+            'nonce': str(uuid.uuid4())
+        }
+        self.send(data)
+
+    def clear_activity(self):
+        data = {
+            'cmd': 'SET_ACTIVITY',
+            'args': {'pid': os.getpid()},
             'nonce': str(uuid.uuid4())
         }
         self.send(data)
