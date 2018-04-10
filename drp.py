@@ -1,3 +1,4 @@
+from functools import partial
 import logging
 import os
 import time
@@ -263,6 +264,9 @@ class DiscordrpConnectCommand(sublime_plugin.ApplicationCommand):
         return not bool(ipc)
 
     def run(self):
+        sublime.set_timeout_async(self.run_async)
+
+    def run_async(self):
         connect()
 
 
@@ -272,6 +276,9 @@ class DiscordrpReconnectCommand(sublime_plugin.ApplicationCommand):
         return bool(ipc)
 
     def run(self):
+        sublime.set_timeout_async(self.run_async)
+
+    def run_async(self):
         disconnect()
         connect()
 
@@ -282,6 +289,9 @@ class DiscordrpDisconnectCommand(sublime_plugin.ApplicationCommand):
         return bool(ipc) or is_connecting
 
     def run(self):
+        sublime.set_timeout_async(self.run_async)
+
+    def run_async(self):
         global is_connecting
         disconnect()
         is_connecting = False
@@ -291,7 +301,7 @@ def plugin_loaded():
     global settings
     settings = sublime.load_settings(SETTINGS_FILE)
     if settings.get('connect_on_startup'):
-        connect(silent=True)
+        sublime.set_timeout_async(partial(connect, silent=True), 0)
 
 
 def plugin_unloaded():

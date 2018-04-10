@@ -105,8 +105,16 @@ class DiscordIpcClient(metaclass=ABCMeta):
         self.close()
 
     def send_recv(self, data, *, op=OP_FRAME):
+        nonce = data.get('nonce')
         self.send(data, op)
-        return self.recv()
+        while True:
+            # TODO timeout
+            reply = self.recv()
+            if reply.get('nonce') == nonce:
+                return reply
+            else:
+                logger.warning("received unexpected reply; %s", reply)
+        return
 
     def send(self, data, *, op=OP_FRAME):
         logger.debug("sending %s", data)
@@ -134,7 +142,7 @@ class DiscordIpcClient(metaclass=ABCMeta):
                      'activity': act},
             'nonce': str(uuid.uuid4())
         }
-        self.send(data)
+        return self.send_recv(data)
 
     def clear_activity(self):
         data = {
@@ -142,7 +150,7 @@ class DiscordIpcClient(metaclass=ABCMeta):
             'args': {'pid': os.getpid()},
             'nonce': str(uuid.uuid4())
         }
-        self.send(data)
+        return self.send_recv(data)
 
 
 class WinDiscordIpcClient(DiscordIpcClient):
