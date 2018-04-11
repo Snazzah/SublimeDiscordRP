@@ -106,11 +106,11 @@ class DiscordIpcClient(metaclass=ABCMeta):
 
     def send_recv(self, data, *, op=OP_FRAME):
         nonce = data.get('nonce')
-        self.send(data, op)
+        self.send(data, op=op)
         while True:
             # TODO timeout
             reply = self.recv()
-            if reply.get('nonce') == nonce:
+            if reply[1].get('nonce') == nonce:
                 return reply
             else:
                 logger.warning("received unexpected reply; %s", reply)
