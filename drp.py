@@ -131,6 +131,10 @@ def handle_activity(view, is_write=False):
 
     main_scope = view.scope_name(0).split()[0]
     icon = get_icon(main_scope)
+
+    if settings.get('game_name'):
+        act['assets']['small_text'] = settings.get('game_name')
+
     if settings.get('big_icon'):
         act['assets']['small_image'] = act['assets']['large_image']
         act['assets']['small_text'] = act['assets']['large_text']

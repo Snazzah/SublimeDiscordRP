@@ -33,6 +33,9 @@
 
     // Use the language icon as the big icon, overrides 'small_icon'
     "big_icon": false,
+    
+    // What to display as the game being played
+    "game_name": "Sublime Text",
 
     // Defines the order of name sources that should be used for the project name in format stings, if available.
     //
