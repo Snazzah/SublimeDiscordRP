@@ -3,7 +3,9 @@
 <h1>Sublime Discord Rich Presence</h1>
 </center>
 
-Discord Rich Presence for Sublime Text 3.
+Discord Rich Presence for Sublime Text 3.  
+</br>
+<hr>
 
 ## Preview
 
