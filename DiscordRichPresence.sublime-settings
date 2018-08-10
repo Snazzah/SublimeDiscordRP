@@ -13,6 +13,7 @@
     //   {lang} - The language of the file (Ex. JavaScript)
     //   {size} - The size of the file
     //   {sizehf} - The human friendly size of the file
+    //   {loc} - The amount of lines of code of the file
     //   {project} - The project name (or folder name) that the file is contained in. See `project_name` setting.
     //   {folders} - The number of folders open
 
