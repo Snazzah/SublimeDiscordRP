@@ -114,6 +114,7 @@ def handle_activity(view, is_write=False):
         project=get_project_name(window, entity),
         size=view.size(),
         sizehf=sizehf(view.size()),
+        loc=view.rowcol(view.size())[0]+1,
         folders=len(window.folders()),
     )
     last_file = entity
