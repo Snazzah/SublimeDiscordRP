@@ -167,7 +167,7 @@ class WinDiscordIpcClient(DiscordIpcClient):
             else:
                 break
         else:
-            return DiscordIpcError("Failed to connect to Discord pipe")
+            raise DiscordIpcError("Failed to connect to Discord pipe")
 
         self.path = path
 
