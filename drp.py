@@ -2,6 +2,7 @@ from functools import partial
 import logging
 import os
 import time
+from time import mktime
 
 import sublime
 import sublime_plugin
@@ -20,7 +21,7 @@ last_edit = 0
 ipc = None
 is_connecting = False
 
-start_time = time.time()
+start_time = mktime(time.localtime())
 
 
 def base_activity():
