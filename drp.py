@@ -295,8 +295,8 @@ class DiscordrpDisconnectCommand(sublime_plugin.ApplicationCommand):
 
     def run_async(self):
         global is_connecting
-        disconnect()
         is_connecting = False
+        disconnect()
 
 
 def plugin_loaded():
@@ -307,4 +307,6 @@ def plugin_loaded():
 
 
 def plugin_unloaded():
+    global is_connecting
+    is_connecting = False
     disconnect()
