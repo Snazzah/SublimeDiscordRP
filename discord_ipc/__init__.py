@@ -188,7 +188,7 @@ class UnixDiscordIpcClient(DiscordIpcClient):
         self._sock = socket.socket(socket.AF_UNIX)
         pipe_pattern = self._get_pipe_pattern()
 
-        for i in range(10):
+        for path in self._iter_path_candidates():
             path = pipe_pattern.format(i)
             if not os.path.exists(path):
                 continue
@@ -202,15 +202,20 @@ class UnixDiscordIpcClient(DiscordIpcClient):
             raise DiscordIpcError("Failed to connect to a Discord pipe")
 
     @staticmethod
-    def _get_pipe_pattern():
+    def _iter_path_candidates():
         env_keys = ('XDG_RUNTIME_DIR', 'TMPDIR', 'TMP', 'TEMP')
         for env_key in env_keys:
             dir_path = os.environ.get(env_key)
             if dir_path:
                 break
         else:
-            dir_path = '/tmp'
-        return os.path.join(dir_path, 'discord-ipc-{}')
+            dir_path = "/tmp"
+        snap_path = os.path.join(dir_path, "snap.discord")
+        if os.path.exists(snap_path):
+            for i in range(10):
+                yield os.path.join(snap_path, "discord-ipc-{}".format(i))
+        for i in range(10):
+            yield os.path.join(dir_path, "discord-ipc-{}".format(i))
 
     def _write(self, data: bytes):
         self._sock.sendall(data)
