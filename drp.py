@@ -33,6 +33,7 @@ def base_activity():
         activity['timestamps'] = {'start': start_time}
     return activity
 
+
 # List of icon names that are also language names.
 AVAILABLES_ICONS = {
     'c',
@@ -62,6 +63,7 @@ SCOPE_ICON_MAP = {
     'html.markdown': 'markdown',
 }
 
+
 def get_icon(main_scope):
     base_scope, sub_scope = main_scope.split('.', 1)
     icon = 'text' if base_scope == 'text' else 'unknown'
@@ -76,11 +78,13 @@ def get_icon(main_scope):
     logger.debug('Using icon "%s" for scope "%s"', icon, main_scope)
     return 'lang-%s' % icon
 
+
 def yield_subscopes(scope):
     last_dot = len(scope)
     while last_dot > 0:
         yield scope[:last_dot]
         last_dot = scope[:last_dot].rfind('.')
+
 
 def sizehf(num):
     for unit in ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z']:
@@ -115,7 +119,7 @@ def handle_activity(view, is_write=False):
         project=get_project_name(window, entity),
         size=view.size(),
         sizehf=sizehf(view.size()),
-        loc=view.rowcol(view.size())[0]+1,
+        loc=view.rowcol(view.size())[0] + 1,
         folders=len(window.folders()),
     )
     last_file = entity
