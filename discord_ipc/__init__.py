@@ -160,10 +160,11 @@ class WinDiscordIpcClient(DiscordIpcClient):
     def _connect(self):
         for i in range(10):
             path = self._pipe_pattern.format(i)
+            logger.debug("Attempting to open %r", path)
             try:
                 self._f = open(path, "w+b")
             except OSError as e:
-                logger.error("failed to open {!r}: {}".format(path, e))
+                logger.error("failed to open %r: %s", path, e)
             else:
                 break
         else:
@@ -186,16 +187,18 @@ class UnixDiscordIpcClient(DiscordIpcClient):
 
     def _connect(self):
         self._sock = socket.socket(socket.AF_UNIX)
-        pipe_pattern = self._get_pipe_pattern()
 
         for path in self._iter_path_candidates():
-            path = pipe_pattern.format(i)
             if not os.path.exists(path):
+                logger.debug("%r not found", path)
                 continue
+            logger.debug("Attempting to connecting to %r", path)
             try:
                 self._sock.connect(path)
             except OSError as e:
-                logger.error("failed to open {!r}: {}".format(path, e))
+                logger.error("failed to connect to %r: %s", path, e)
+            except Exception as e:
+                logger.error("[!] failed to connect to %r", path, exc_info=e)
             else:
                 break
         else:

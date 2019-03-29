@@ -198,6 +198,7 @@ def is_view_active(view):
                 return active_view.buffer_id() == view.buffer_id()
     return False
 
+
 def connect(silent=False, retry=True):
     global ipc
     if ipc:
@@ -206,10 +207,10 @@ def connect(silent=False, retry=True):
 
     try:
         ipc = discord_ipc.DiscordIpcClient.for_platform(DISCORD_CLIENT_ID)
-    except OSError:
-        if silent:
-            logger.info("Unable to connect to Discord client")
-        else:
+    except (OSError, discord_ipc.DiscordIpcError) as e:
+        logger.info("Unable to connect to Discord client")
+        logger.debug("Error while connecting", exc_info=e)
+        if not silent:
             sublime.error_message("[DiscordRP] Unable to connect to Discord client."
                                   "\n\nPlease verify that it is running."
                                   " Run 'Discord Rich Presence: Connect to Discord'"
@@ -245,8 +246,8 @@ def disconnect():
         try:
             ipc.clear_activity()
             ipc.close()
-        except OSError:
-            pass
+        except OSError as e:
+            logger.debug("Error while disconnecting", exc_info=e)
         ipc = None
 
 
