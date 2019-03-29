@@ -199,7 +199,7 @@ class UnixDiscordIpcClient(DiscordIpcClient):
             else:
                 break
         else:
-            return DiscordIpcError("Failed to connect to Discord pipe")
+            raise DiscordIpcError("Failed to connect to a Discord pipe")
 
     @staticmethod
     def _get_pipe_pattern():
