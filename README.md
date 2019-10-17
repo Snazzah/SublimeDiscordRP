@@ -11,7 +11,7 @@ Discord Rich Presence for Sublime Text 3.
 
 |  User Modal  | Popout Modal
 | ------------ | ------------------------------------------
-| ![](https://i-need.discord.cards/fc30f4.png) | ![](https://i-need.discord.cards/c408bd.png)
+| ![](https://get.ratelimited.today/fc30f4.png) | ![](https://get.ratelimited.today/c408bd.png)
 
 
 ## Installation
