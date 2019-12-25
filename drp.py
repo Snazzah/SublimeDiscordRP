@@ -51,6 +51,7 @@ AVAILABLES_ICONS = {
     'ruby',
     'html',
     'rust',
+    'v',
 }
 
 # Map a scope to a specific icon. The first token of the scope (source or text)
