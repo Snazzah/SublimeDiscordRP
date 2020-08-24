@@ -11,7 +11,7 @@ from . import discord_ipc
 
 SETTINGS_FILE = 'DiscordRichPresence.sublime-settings'
 settings = {}
-DISCORD_CLIENT_ID = '389368374645227520'
+DISCORD_CLIENT_ID = '747455388932243546'
 RECONNECT_DELAY = 15000
 
 logger = logging.getLogger(__name__)
@@ -27,7 +27,7 @@ start_time = mktime(time.localtime())
 def base_activity():
     activity = {
         'assets': {'large_image': 'sublime3',
-                   'large_text': 'Sublime Text 3 v%s' % (sublime.version())},
+                   'large_text': 'Sublime Text 3'},
     }
     if settings.get('send_start_timestamp'):
         activity['timestamps'] = {'start': start_time}
@@ -77,7 +77,7 @@ def get_icon(main_scope):
             break
 
     logger.debug('Using icon "%s" for scope "%s"', icon, main_scope)
-    return 'lang-%s' % icon
+    return icon
 
 
 def yield_subscopes(scope):
