@@ -51,6 +51,7 @@ AVAILABLES_ICONS = {
     'html',
     'rust',
     'v',
+    'shell'
 }
 
 # Map a scope to a specific icon. The first token of the scope (source or text)
@@ -61,7 +62,6 @@ SCOPE_ICON_MAP = {
     'js': 'javascript',
     'ts': 'typescript',
     'html.markdown': 'markdown',
-    'json,': 'json'
 }
 
 
@@ -72,8 +72,8 @@ def get_icon(main_scope):
         if scope in SCOPE_ICON_MAP:
             icon = SCOPE_ICON_MAP[scope]
             break
-        elif scope in AVAILABLES_ICONS:
-            icon = scope
+        elif scope.replace(',', '') in AVAILABLES_ICONS:
+            icon = scope.replace(',', '')
             break
 
     logger.warning('Using icon "%s" for scope "%s"', icon, main_scope)
