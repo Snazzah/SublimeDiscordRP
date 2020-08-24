@@ -40,7 +40,6 @@ AVAILABLES_ICONS = {
     'crystal',
     'cs',
     'css',
-    'd',
     'elixir',
     'go',
     'java',
