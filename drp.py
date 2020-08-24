@@ -61,6 +61,7 @@ SCOPE_ICON_MAP = {
     'js': 'javascript',
     'ts': 'typescript',
     'html.markdown': 'markdown',
+    'json,': 'json'
 }
 
 
@@ -75,7 +76,7 @@ def get_icon(main_scope):
             icon = scope
             break
 
-    logger.debug('Using icon "%s" for scope "%s"', icon, main_scope)
+    logger.warning('Using icon "%s" for scope "%s"', icon, main_scope)
     return icon
 
 
