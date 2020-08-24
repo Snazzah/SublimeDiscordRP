@@ -1,8 +1,5 @@
 // DiscordRP Default Settings
 {
-    // Whether or not to connect to Discord on startup.
-    "connect_on_startup": true,
-
     // Specify log level. Valid are "ERROR", "WARNING", "INFO", "DEBUG".
     "log_level": "WARNING",
 
@@ -18,10 +15,10 @@
     //   {folders} - The number of folders open
 
     // The format the presence details (top line) will be in.
-    "details": "Editing {file} for Project {project}",
+    "details": "Editing {file}",
 
     // The format the presence state (bottom line) will be in.
-    "state": "Size: {sizehf}",
+    "state": "Workspace: {project_name}",
 
     // The state message when Sublime Text (or the plugin) starts. (NOT FORMATTED)
     "start_state": "Just launched",
@@ -30,10 +27,10 @@
     "send_start_timestamp": true,
 
     // Whether or not to use the small icon (changes for every language) in the presence.
-    "small_icon": true,
+    "small_icon": false,
 
     // Use the language icon as the big icon, overrides 'small_icon'
-    "big_icon": false,
+    "big_icon": true,
 
     // Defines the order of name sources that should be used for the project name in format stings, if available.
     //
