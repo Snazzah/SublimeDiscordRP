@@ -63,16 +63,17 @@ SCOPE_ICON_MAP = {
     'html.markdown': 'markdown',
 }
 
-def get_icon(main_scope):
-    base_scope = main_scope.split('.')[0]
+def get_icon(_scope):
+    main_scope = _scope.split()[0]
+    base_scope = main_scope.split()[0].split('.')[0]
     try:
-        sub_scope = main_scope.split('.')[1]
+        sub_scope = '.'.join(main_scope.split()[0].split('.')[1::])
     except:
         sub_scope = 'none'
 
     icon = 'text' if base_scope == 'text' else 'unknown'
     icon = 'license' if base_scope == 'license' else 'unknown'
-    
+
     for scope in yield_subscopes(sub_scope):
         if scope in SCOPE_ICON_MAP:
             icon = SCOPE_ICON_MAP[scope]
@@ -80,8 +81,9 @@ def get_icon(main_scope):
         elif scope.replace(',', '') in AVAILABLES_ICONS:
             icon = scope.replace(',', '')
             break
+    icon = 'git' if 'git' in _scope else icon
 
-    logger.warning('Using icon "%s" for scope "%s"', icon, main_scope)
+    logger.info('Using icon "%s" for scope "%s"', icon, main_scope)
     return icon
 
 
@@ -141,7 +143,7 @@ def handle_activity(view, is_write=False):
     if state_format:
         act['state'] = state_format.format(**format_dict)
 
-    main_scope = view.scope_name(0).split()[0]
+    main_scope = view.scope_name(0)
     icon = get_icon(main_scope)
     if settings.get('big_icon'):
         act['assets']['small_image'] = act['assets']['large_image']
@@ -313,8 +315,7 @@ class DiscordrpDisconnectCommand(sublime_plugin.ApplicationCommand):
 def plugin_loaded():
     global settings
     settings = sublime.load_settings(SETTINGS_FILE)
-    if settings.get('connect_on_startup'):
-        sublime.set_timeout_async(partial(connect, silent=True), 0)
+    sublime.set_timeout_async(partial(connect, silent=True), 0)
 
 
 def plugin_unloaded():
