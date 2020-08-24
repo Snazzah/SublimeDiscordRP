@@ -50,7 +50,6 @@ AVAILABLES_ICONS = {
     'ruby',
     'html',
     'rust',
-    'v',
     'shell'
 }
 
@@ -64,10 +63,16 @@ SCOPE_ICON_MAP = {
     'html.markdown': 'markdown',
 }
 
-
 def get_icon(main_scope):
-    base_scope, sub_scope = main_scope.split('.', 1)
+    base_scope = main_scope.split('.')[0]
+    try:
+        sub_scope = main_scope.split('.')[1]
+    except:
+        sub_scope = 'none'
+
     icon = 'text' if base_scope == 'text' else 'unknown'
+    icon = 'license' if base_scope == 'license' else 'unknown'
+    
     for scope in yield_subscopes(sub_scope):
         if scope in SCOPE_ICON_MAP:
             icon = SCOPE_ICON_MAP[scope]
