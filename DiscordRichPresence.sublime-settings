@@ -18,7 +18,7 @@
     "details": "Editing {file}",
 
     // The format the presence state (bottom line) will be in.
-    "state": "Workspace: {project_name}",
+    "state": "Workspace: {project}",
 
     // The state message when Sublime Text (or the plugin) starts. (NOT FORMATTED)
     "start_state": "Just launched",
