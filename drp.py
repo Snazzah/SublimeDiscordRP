@@ -40,17 +40,19 @@ AVAILABLES_ICONS = {
     'crystal',
     'cs',
     'css',
+    'dart',
     'elixir',
     'go',
+    'html',
     'java',
     'json',
     'lua',
     'php',
     'python',
     'ruby',
-    'html',
     'rust',
-    'shell'
+    'shell',
+    'swift'
 }
 
 # Map a scope to a specific icon. The first token of the scope (source or text)
@@ -61,18 +63,20 @@ SCOPE_ICON_MAP = {
     'js': 'javascript',
     'ts': 'typescript',
     'html.markdown': 'markdown',
+    'Kotlin': 'kotlin'
 }
 
 def get_icon(_scope):
     main_scope = _scope.split()[0]
-    base_scope = main_scope.split()[0].split('.')[0]
+    base_scope = main_scope.split('.')[0]
     try:
         sub_scope = '.'.join(main_scope.split()[0].split('.')[1::])
     except:
         sub_scope = 'none'
 
-    icon = 'text' if base_scope == 'text' else 'unknown'
-    icon = 'license' if base_scope == 'license' else 'unknown'
+    if base_scope == 'license': icon = 'license'
+    elif base_scope == 'text': icon = 'text'
+    else: icon = 'unknown'
 
     for scope in yield_subscopes(sub_scope):
         if scope in SCOPE_ICON_MAP:
@@ -84,6 +88,7 @@ def get_icon(_scope):
     icon = 'git' if 'git' in _scope else icon
 
     logger.info('Using icon "%s" for scope "%s"', icon, main_scope)
+
     return icon
 
 
