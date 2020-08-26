@@ -36,6 +36,7 @@ def base_activity():
 
 # List of icon names that are also language names.
 AVAILABLES_ICONS = {
+    'assembly',
     'c',
     'crystal',
     'cs',
@@ -52,7 +53,8 @@ AVAILABLES_ICONS = {
     'ruby',
     'rust',
     'shell',
-    'swift'
+    'swift',
+    'xml'
 }
 
 # Map a scope to a specific icon. The first token of the scope (source or text)
@@ -151,7 +153,7 @@ def handle_activity(view, is_write=False):
     main_scope = view.scope_name(0)
     icon = get_icon(main_scope)
     if settings.get('big_icon'):
-        act['assets']['small_image'] = act['assets']['large_image']
+        act['assets']['small_image'] = 'lunaria' if format_dict['project'] == 'Lunaria' else act['assets']['large_image']
         act['assets']['small_text'] = act['assets']['large_text']
         act['assets']['large_image'] = icon
         act['assets']['large_text'] = language
