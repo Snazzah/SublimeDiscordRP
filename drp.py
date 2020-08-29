@@ -11,7 +11,7 @@ from . import discord_ipc
 
 SETTINGS_FILE = 'DiscordRichPresence.sublime-settings'
 settings = {}
-DISCORD_CLIENT_ID = '747455388932243546'
+DISCORD_CLIENT_ID = '749282810971291659'
 RECONNECT_DELAY = 15000
 
 logger = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ start_time = mktime(time.localtime())
 
 def base_activity():
     activity = {
-        'assets': {'large_image': 'sublime3',
+        'assets': {'large_image': 'sublime',
                    'large_text': 'Sublime Text 3'},
     }
     if settings.get('send_start_timestamp'):
@@ -34,65 +34,81 @@ def base_activity():
     return activity
 
 
-# List of icon names that are also language names.
-AVAILABLES_ICONS = {
+# List of extensions mapped to language names.
+ICONS = {
+    'asm': 'assembly',
+    'c,h': 'c',
+    'cpp,hpp': 'cpp',
+    'cr': 'crystal',
+    'cs': 'cs',
+    'css': 'css',
+    'dart': 'dart',
+    'ex,exs': 'elixir',
+    'go': 'go',
+    'hs': 'haskell',
+    'htm,html,mhtml': 'html',
+    'java,class': 'java',
+    'js': 'javascript',
+    'json': 'json',
+    'jsx,tsx': 'react',
+    'kt': 'kotlin',
+    'lua': 'lua',
+    'md': 'markdown',
+    'php': 'php',
+    'png,jpg,jpeg,jfif': 'image',
+    'py': 'python',
+    'rb': 'ruby',
+    'rs': 'rust',
+    'sh': 'shell',
+    'swift': 'swift',
+    't': 'perl',
+    'toml': 'toml',
+    'ts': 'typescript',
+    'txt': 'text',
+    'vue': 'vue',
+    'xml': 'xml'
+}
+
+# Scopes we can/should fallback to
+SCOPES = {
     'assembly',
     'c',
-    'crystal',
+    'cpp',
     'cs',
     'css',
-    'dart',
-    'elixir',
-    'go',
     'html',
     'java',
     'json',
-    'lua',
+    'perl'
     'php',
     'python',
-    'ruby',
-    'rust',
-    'shell',
-    'swift',
-    'xml'
+    'scala'
 }
 
-# Map a scope to a specific icon. The first token of the scope (source or text)
-# has been dropped.
-SCOPE_ICON_MAP = {
-    'c++': 'cpp',
-    'java-props': 'java',
-    'js': 'javascript',
-    'ts': 'typescript',
-    'html.markdown': 'markdown',
-    'Kotlin': 'kotlin'
-}
-
-def get_icon(_scope):
+def get_icon(file, ext, _scope):
     main_scope = _scope.split()[0]
     base_scope = main_scope.split('.')[0]
     try:
         sub_scope = '.'.join(main_scope.split()[0].split('.')[1::])
     except:
-        sub_scope = 'none'
+        sub_scope = ''
 
-    if base_scope == 'license': icon = 'license'
-    elif base_scope == 'text': icon = 'text'
-    else: icon = 'unknown'
-
-    for scope in yield_subscopes(sub_scope):
-        if scope in SCOPE_ICON_MAP:
-            icon = SCOPE_ICON_MAP[scope]
+    for _icon in ICONS:
+        if ext in _icon.split(','):
+            icon = ICONS[_icon]
             break
-        elif scope.replace(',', '') in AVAILABLES_ICONS:
-            icon = scope.replace(',', '')
-            break
-    icon = 'git' if 'git' in _scope else icon
+        else:
+            for scope in yield_subscopes(sub_scope):
+                if scope.replace(',', '') in SCOPES:
+                    icon = scope.replace(',', '')
+                    break
+                else:
+                    icon = 'unknown'
 
-    logger.info('Using icon "%s" for scope "%s"', icon, main_scope)
+    if file == 'LICENSE': icon = 'license'
+    logger.info('Using icon "%s" for file %s', icon, file)
 
     return icon
-
 
 def yield_subscopes(scope):
     last_dot = len(scope)
@@ -109,21 +125,26 @@ def sizehf(num):
     return "%.1f%s%s" % (num, 'Yi', 'B')
 
 
-def handle_activity(view, is_write=False):
+def handle_activity(view, is_write=False, idle=False):
     window = view.window()
     entity = view.file_name()
     if not (ipc and window and entity):
         return
 
+    act = base_activity()
+
     # TODO refactor these globals
     global last_file
     global last_edit
-    if last_file == entity and time.time() - last_edit < 59 and not is_write:
-        return
+    if last_file != entity and settings.get('time_per_file'):
+        logger.info('adding new timestamp')
+        act['timestamps']['start'] = mktime(time.localtime())
 
     logger.info('Updating activity')
 
-    extension = os.path.splitext(entity)[1]
+    try: extension = entity.split('.')[1]
+    except: extension = ''
+
     language = os.path.splitext(os.path.basename(view.settings().get('syntax')))[0]
     if len(language) < 2:
         language += ' Syntax'
@@ -140,8 +161,6 @@ def handle_activity(view, is_write=False):
     last_file = entity
     last_edit = time.time()
 
-    act = base_activity()
-
     details_format = settings.get('details')
     if details_format:
         act['details'] = details_format.format(**format_dict)
@@ -151,16 +170,16 @@ def handle_activity(view, is_write=False):
         act['state'] = state_format.format(**format_dict)
 
     main_scope = view.scope_name(0)
-    icon = get_icon(main_scope)
+    icon = get_icon(format_dict['file'], format_dict['extension'], main_scope)
     if settings.get('big_icon'):
-        act['assets']['small_image'] = 'lunaria' if format_dict['project'] == 'Lunaria' else act['assets']['large_image']
+        act['assets']['small_image'] = 'afk' if idle == True else act['assets']['large_image']
         act['assets']['small_text'] = act['assets']['large_text']
         act['assets']['large_image'] = icon
         act['assets']['large_text'] = language
     elif settings.get('small_icon'):
         act['assets']['small_image'] = icon
         act['assets']['small_text'] = language
-
+    logger.info(window.folders())
     try:
         ipc.set_activity(act)
     except OSError as e:
@@ -277,8 +296,12 @@ class DRPListener(sublime_plugin.EventListener):
 
     def on_modified_async(self, view):
         if is_view_active(view):
-            handle_activity(view)
+            if view.file_name() != last_file:
+                logger.info(last_file)
+                handle_activity(view)
 
+    def on_load_async(self, view):
+        handle_activity(view)
 
 class DiscordrpConnectCommand(sublime_plugin.ApplicationCommand):
 
