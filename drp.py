@@ -26,9 +26,21 @@ start_time = mktime(time.localtime())
 
 def base_activity():
     activity = {
-        'assets': {'large_image': 'sublime',
-                   'large_text': 'Sublime Text 3'},
+        'assets': {
+            'small_image': 'afk',
+            'small_text': 'Idle',
+            'large_image': 'sublime',
+            'large_text': 'Sublime Text 3'
+        },
+        'state': 'Idling'
     }
+    if settings.get('big_icon'):
+        activity['assets'] = {
+            'large_image': 'afk',
+            'large_text': 'Idle',
+            'small_image': 'sublime',
+            'small_text': 'Sublime Text 3'
+        }
     if settings.get('send_start_timestamp'):
         activity['timestamps'] = {'start': start_time}
     return activity
@@ -42,6 +54,7 @@ ICONS = {
     'cr': 'crystal',
     'cs': 'cs',
     'css': 'css',
+    'cvm': 'chocovm',
     'dart': 'dart',
     'ex,exs': 'elixir',
     'go': 'go',
@@ -172,8 +185,8 @@ def handle_activity(view, is_write=False, idle=False):
     main_scope = view.scope_name(0)
     icon = get_icon(format_dict['file'], format_dict['extension'], main_scope)
     if settings.get('big_icon'):
-        act['assets']['small_image'] = 'afk' if idle == True else act['assets']['large_image']
-        act['assets']['small_text'] = act['assets']['large_text']
+        act['assets']['small_image'] = 'afk' if idle == True else act['assets']['small_image']
+        act['assets']['small_text'] = act['assets']['small_text']
         act['assets']['large_image'] = icon
         act['assets']['large_text'] = language
     elif settings.get('small_icon'):
@@ -302,6 +315,12 @@ class DRPListener(sublime_plugin.EventListener):
 
     def on_load_async(self, view):
         handle_activity(view)
+
+    def on_close(self, view):
+        if view.window() == None:
+            logger.info('using idle presence')
+            try: ipc.set_activity(base_activity())
+            except OSError as e: handle_error(e)
 
 class DiscordrpConnectCommand(sublime_plugin.ApplicationCommand):
 
