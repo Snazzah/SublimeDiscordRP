@@ -22,6 +22,7 @@ ipc = None
 is_connecting = False
 
 start_time = mktime(time.localtime())
+stamp = start_time
 
 
 def base_activity():
@@ -41,8 +42,6 @@ def base_activity():
             'small_image': 'sublime',
             'small_text': 'Sublime Text 3'
         }
-    if settings.get('send_start_timestamp'):
-        activity['timestamps'] = {'start': start_time}
     return activity
 
 
@@ -149,9 +148,10 @@ def handle_activity(view, is_write=False, idle=False):
     # TODO refactor these globals
     global last_file
     global last_edit
+    global stamp
     if last_file != entity and settings.get('time_per_file'):
         logger.info('adding new timestamp')
-        act['timestamps']['start'] = mktime(time.localtime())
+        stamp = mktime(time.localtime())
 
     logger.info('Updating activity')
 
@@ -192,6 +192,7 @@ def handle_activity(view, is_write=False, idle=False):
     elif settings.get('small_icon'):
         act['assets']['small_image'] = icon
         act['assets']['small_text'] = language
+    act['timestamps'] = {'start': stamp}
     logger.info(window.folders())
     try:
         ipc.set_activity(act)
@@ -272,8 +273,10 @@ def connect(silent=False, retry=True):
             sublime.set_timeout_async(connect_background, RECONNECT_DELAY)
         return
 
+    act = base_activity()
+    act['timestamps'] = {'start': start_time}
     try:
-        ipc.set_activity(base_activity())
+        ipc.set_activity(act)
     except OSError as e:
         handle_error(e, retry=retry)
         return
@@ -319,7 +322,9 @@ class DRPListener(sublime_plugin.EventListener):
     def on_close(self, view):
         if view.window() == None:
             logger.info('using idle presence')
-            try: ipc.set_activity(base_activity())
+            act = base_activity()
+            act['timestamps'] = {'start': start_time}
+            try: ipc.set_activity(act)
             except OSError as e: handle_error(e)
 
 class DiscordrpConnectCommand(sublime_plugin.ApplicationCommand):
