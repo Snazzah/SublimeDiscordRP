@@ -1,7 +1,7 @@
 # SublimeDiscordRP
 > 📄 Discord rich presence for Sublime Text.
 
-A SublimeDiscordRP fork with nicer icons and more language support.
+A SublimeDiscordRP fork with nicer icons, bug fixes and more language support.
 
 ## Preview
 ![](https://modeus.is-inside.me/O77P2hjS.png) ![](https://modeus.is-inside.me/vUbc3hc1.png)
