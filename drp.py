@@ -11,7 +11,7 @@ from . import discord_ipc
 
 SETTINGS_FILE = 'DiscordRichPresence.sublime-settings'
 settings = {}
-DISCORD_CLIENT_ID = '747455388932243546'
+DISCORD_CLIENT_ID = '389368374645227520'
 RECONNECT_DELAY = 15000
 
 logger = logging.getLogger(__name__)
@@ -27,7 +27,7 @@ start_time = mktime(time.localtime())
 def base_activity():
     activity = {
         'assets': {'large_image': 'sublime3',
-                   'large_text': 'Sublime Text 3'},
+                   'large_text': 'Sublime Text 3 v%s' % (sublime.version())},
     }
     if settings.get('send_start_timestamp'):
         activity['timestamps'] = {'start': start_time}
@@ -40,6 +40,7 @@ AVAILABLES_ICONS = {
     'crystal',
     'cs',
     'css',
+    'd',
     'elixir',
     'go',
     'java',
@@ -50,8 +51,7 @@ AVAILABLES_ICONS = {
     'ruby',
     'html',
     'rust',
-    'v',
-    'shell'
+    'v'
 }
 
 # Map a scope to a specific icon. The first token of the scope (source or text)
@@ -76,8 +76,8 @@ def get_icon(main_scope):
             icon = scope.replace(',', '')
             break
 
-    logger.warning('Using icon "%s" for scope "%s"', icon, main_scope)
-    return icon
+    logger.debug('Using icon "%s" for scope "%s"', icon, main_scope)
+    return 'lang-%s' % icon
 
 
 def yield_subscopes(scope):
