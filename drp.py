@@ -155,7 +155,7 @@ def handle_activity(view, is_write=False, idle=False):
 
     logger.info('Updating activity')
 
-    try: extension = entity.split('.')[1]
+    try: extension = entity.split('.')[len(entity.split('.')) - 1]
     except: extension = ''
 
     language = os.path.splitext(os.path.basename(view.settings().get('syntax')))[0]
