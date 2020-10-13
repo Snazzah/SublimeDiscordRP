@@ -53,6 +53,7 @@ ICONS = {
     'cr': 'crystal',
     'cs': 'cs',
     'css': 'css',
+    'd': 'd',
     'dart': 'dart',
     'ex,exs': 'elixir',
     'go': 'go',
@@ -66,7 +67,7 @@ ICONS = {
     'lua': 'lua',
     'md': 'markdown',
     'php': 'php',
-    'png,jpg,jpeg,jfif': 'image',
+    'png,jpg,jpeg,jfif,gif,webp': 'image',
     'py': 'python',
     'rb': 'ruby',
     'rs': 'rust',
@@ -77,7 +78,7 @@ ICONS = {
     'ts': 'typescript',
     'txt': 'text',
     'vue': 'vue',
-    'xml': 'xml'
+    'xml,svg': 'xml',
 }
 
 # Scopes we can/should fallback to
@@ -87,13 +88,14 @@ SCOPES = {
     'cpp',
     'cs',
     'css',
+    'd',
     'html',
     'java',
     'json',
     'perl'
     'php',
     'python',
-    'scala'
+    'scala',
 }
 
 def get_icon(file, ext, _scope):
