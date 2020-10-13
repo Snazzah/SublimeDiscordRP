@@ -72,8 +72,8 @@ def get_icon(main_scope):
         if scope in SCOPE_ICON_MAP:
             icon = SCOPE_ICON_MAP[scope]
             break
-        elif scope in AVAILABLES_ICONS:
-            icon = scope
+        elif scope.replace(',', '') in AVAILABLES_ICONS:
+            icon = scope.replace(',', '')
             break
 
     logger.debug('Using icon "%s" for scope "%s"', icon, main_scope)
