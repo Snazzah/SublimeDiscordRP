@@ -1,5 +1,8 @@
 // DiscordRP Default Settings
 {
+    // Whether or not to connect to Discord on startup. 
+    "connect_on_startup": true,
+
     // Specify log level. Valid are "ERROR", "WARNING", "INFO", "DEBUG".
     "log_level": "WARNING",
 
@@ -15,10 +18,10 @@
     //   {folders} - The number of folders open
 
     // The format the presence details (top line) will be in.
-    "details": "Editing {file}",
+    "details": "Editing {file} for Project {project}",
 
     // The format the presence state (bottom line) will be in.
-    "state": "Workspace: {project}",
+    "state": "Size: {sizehf}",
 
     // The state message when Sublime Text (or the plugin) starts. (NOT FORMATTED)
     "start_state": "Just launched",

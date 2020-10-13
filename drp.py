@@ -11,7 +11,7 @@ from . import discord_ipc
 
 SETTINGS_FILE = 'DiscordRichPresence.sublime-settings'
 settings = {}
-DISCORD_CLIENT_ID = '749282810971291659'
+DISCORD_CLIENT_ID = '389368374645227520'
 RECONNECT_DELAY = 15000
 
 logger = logging.getLogger(__name__)
@@ -31,7 +31,7 @@ def base_activity():
             'small_image': 'afk',
             'small_text': 'Idle',
             'large_image': 'sublime',
-            'large_text': 'Sublime Text 3'
+            'large_text': 'Sublime Text 3 v%s' % (sublime.version())
         },
         'state': 'Idling'
     }
@@ -40,7 +40,7 @@ def base_activity():
             'large_image': 'afk',
             'large_text': 'Idle',
             'small_image': 'sublime',
-            'small_text': 'Sublime Text 3'
+            'small_text': 'Sublime Text 3 v%s' % (sublime.version())
         }
     return activity
 
@@ -53,7 +53,6 @@ ICONS = {
     'cr': 'crystal',
     'cs': 'cs',
     'css': 'css',
-    'cvm': 'chocovm',
     'dart': 'dart',
     'ex,exs': 'elixir',
     'go': 'go',
@@ -118,9 +117,9 @@ def get_icon(file, ext, _scope):
                     icon = 'unknown'
 
     if file == 'LICENSE': icon = 'license'
-    logger.info('Using icon "%s" for file %s', icon, file)
+    logger.debug('Using icon "%s" for file %s', icon, file)
 
-    return icon
+    return 'lang-%s' % icon
 
 def yield_subscopes(scope):
     last_dot = len(scope)
@@ -369,7 +368,8 @@ class DiscordrpDisconnectCommand(sublime_plugin.ApplicationCommand):
 def plugin_loaded():
     global settings
     settings = sublime.load_settings(SETTINGS_FILE)
-    sublime.set_timeout_async(partial(connect, silent=True), 0)
+    if settings.get('connect_on_startup'):
+        sublime.set_timeout_async(partial(connect, silent=True), 0)
 
 
 def plugin_unloaded():
