@@ -30,16 +30,16 @@ def base_activity():
         'assets': {
             'small_image': 'afk',
             'small_text': 'Idle',
-            'large_image': 'sublime',
+            'large_image': 'sublime3',
             'large_text': 'Sublime Text 3 v%s' % (sublime.version())
         },
-        'state': 'Idling'
+        'state': settings.get('start_state')
     }
     if settings.get('big_icon'):
         activity['assets'] = {
             'large_image': 'afk',
             'large_text': 'Idle',
-            'small_image': 'sublime',
+            'small_image': 'sublime3',
             'small_text': 'Sublime Text 3 v%s' % (sublime.version())
         }
     return activity
