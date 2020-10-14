@@ -56,10 +56,11 @@ ICONS = {
     'd': 'd',
     'dart': 'dart',
     'ex,exs': 'elixir',
+    'gitignore,gitattributes,gitmodules': 'git',
     'go': 'go',
     'hs': 'haskell',
     'htm,html,mhtml': 'html',
-    'java,class': 'java',
+    'java,class,properties': 'java',
     'js': 'javascript',
     'json': 'json',
     'jsx,tsx': 'react',
@@ -76,9 +77,9 @@ ICONS = {
     't': 'perl',
     'toml': 'toml',
     'ts': 'typescript',
-    'txt': 'text',
+    'txt,rst,rest': 'text',
     'vue': 'vue',
-    'xml,svg': 'xml',
+    'xml,svg,yml,yaml': 'xml',
 }
 
 # Scopes we can/should fallback to
@@ -89,11 +90,14 @@ SCOPES = {
     'cs',
     'css',
     'd',
+    'erlang',
     'html',
     'java',
     'json',
-    'perl'
+    'pde',
+    'perl',
     'php',
+    'pawn',
     'python',
     'scala',
 }
@@ -119,7 +123,7 @@ def get_icon(file, ext, _scope):
                     icon = 'unknown'
 
     if file == 'LICENSE': icon = 'license'
-    logger.debug('Using icon "%s" for file %s', icon, file)
+    logger.debug('Using icon "%s" for file %s (scope: %s)', icon, file, main_scope)
 
     return 'lang-%s' % icon
 
