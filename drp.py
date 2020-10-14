@@ -31,7 +31,7 @@ def base_activity():
             'small_image': 'afk',
             'small_text': 'Idle',
             'large_image': 'sublime3',
-            'large_text': 'Sublime Text 3 v%s' % (sublime.version())
+            'large_text': 'Sublime Text v%s' % (sublime.version())
         },
         'state': settings.get('start_state')
     }
@@ -40,7 +40,7 @@ def base_activity():
             'large_image': 'afk',
             'large_text': 'Idle',
             'small_image': 'sublime3',
-            'small_text': 'Sublime Text 3 v%s' % (sublime.version())
+            'small_text': 'Sublime Text v%s' % (sublime.version())
         }
     return activity
 
@@ -56,10 +56,11 @@ ICONS = {
     'd': 'd',
     'dart': 'dart',
     'ex,exs': 'elixir',
+    'gitignore,gitattributes,gitmodules': 'git',
     'go': 'go',
     'hs': 'haskell',
     'htm,html,mhtml': 'html',
-    'java,class': 'java',
+    'java,class,properties': 'java',
     'js': 'javascript',
     'json': 'json',
     'jsx,tsx': 'react',
@@ -76,9 +77,15 @@ ICONS = {
     't': 'perl',
     'toml': 'toml',
     'ts': 'typescript',
+<<<<<<< HEAD
     'txt': 'text',
     'vue': 'vue',
     'xml,svg': 'xml',
+=======
+    'txt,rst,rest': 'text',
+    'vue': 'vue',
+    'xml,svg,yml,yaml': 'xml',
+>>>>>>> 5cebcfa05a3b7220d643616a9cc08be9c77bf67b
 }
 
 # Scopes we can/should fallback to
@@ -93,7 +100,14 @@ SCOPES = {
     'java',
     'json',
     'perl'
+    'erlang',
+    'html',
+    'java',
+    'json',
+    'pde',
+    'perl',
     'php',
+    'pawn',
     'python',
     'scala',
 }
@@ -119,7 +133,7 @@ def get_icon(file, ext, _scope):
                     icon = 'unknown'
 
     if file == 'LICENSE': icon = 'license'
-    logger.debug('Using icon "%s" for file %s', icon, file)
+    logger.debug('Using icon "%s" for file %s (scope: %s)', icon, file, main_scope)
 
     return 'lang-%s' % icon
 
