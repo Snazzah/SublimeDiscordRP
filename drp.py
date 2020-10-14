@@ -22,63 +22,106 @@ ipc = None
 is_connecting = False
 
 start_time = mktime(time.localtime())
+stamp = start_time
 
 
 def base_activity():
     activity = {
-        'assets': {'large_image': 'sublime3',
-                   'large_text': 'Sublime Text 3 v%s' % (sublime.version())},
+        'assets': {
+            'small_image': 'afk',
+            'small_text': 'Idle',
+            'large_image': 'sublime3',
+            'large_text': 'Sublime Text 3 v%s' % (sublime.version())
+        },
+        'state': settings.get('start_state')
     }
-    if settings.get('send_start_timestamp'):
-        activity['timestamps'] = {'start': start_time}
+    if settings.get('big_icon'):
+        activity['assets'] = {
+            'large_image': 'afk',
+            'large_text': 'Idle',
+            'small_image': 'sublime3',
+            'small_text': 'Sublime Text 3 v%s' % (sublime.version())
+        }
     return activity
 
 
-# List of icon names that are also language names.
-AVAILABLES_ICONS = {
+# List of extensions mapped to language names.
+ICONS = {
+    'asm': 'assembly',
+    'c,h': 'c',
+    'cpp,hpp': 'cpp',
+    'cr': 'crystal',
+    'cs': 'cs',
+    'css': 'css',
+    'd': 'd',
+    'dart': 'dart',
+    'ex,exs': 'elixir',
+    'go': 'go',
+    'hs': 'haskell',
+    'htm,html,mhtml': 'html',
+    'java,class': 'java',
+    'js': 'javascript',
+    'json': 'json',
+    'jsx,tsx': 'react',
+    'kt': 'kotlin',
+    'lua': 'lua',
+    'md': 'markdown',
+    'php': 'php',
+    'png,jpg,jpeg,jfif,gif,webp': 'image',
+    'py': 'python',
+    'rb': 'ruby',
+    'rs': 'rust',
+    'sh': 'shell',
+    'swift': 'swift',
+    't': 'perl',
+    'toml': 'toml',
+    'ts': 'typescript',
+    'txt': 'text',
+    'vue': 'vue',
+    'xml,svg': 'xml',
+}
+
+# Scopes we can/should fallback to
+SCOPES = {
+    'assembly',
     'c',
-    'crystal',
+    'cpp',
     'cs',
     'css',
     'd',
-    'elixir',
-    'go',
+    'html',
     'java',
     'json',
-    'lua',
+    'perl'
     'php',
     'python',
-    'ruby',
-    'html',
-    'rust',
-    'v',
+    'scala',
 }
 
-# Map a scope to a specific icon. The first token of the scope (source or text)
-# has been dropped.
-SCOPE_ICON_MAP = {
-    'c++': 'cpp',
-    'java-props': 'java',
-    'js': 'javascript',
-    'ts': 'typescript',
-    'html.markdown': 'markdown',
-}
+def get_icon(file, ext, _scope):
+    main_scope = _scope.split()[0]
+    base_scope = main_scope.split('.')[0]
+    try:
+        sub_scope = '.'.join(main_scope.split()[0].split('.')[1::])
+    except:
+        sub_scope = ''
 
-
-def get_icon(main_scope):
-    base_scope, sub_scope = main_scope.split('.', 1)
-    icon = 'text' if base_scope == 'text' else 'unknown'
-    for scope in yield_subscopes(sub_scope):
-        if scope in SCOPE_ICON_MAP:
-            icon = SCOPE_ICON_MAP[scope]
+    for _icon in ICONS:
+        if ext in _icon.split(','):
+            icon = ICONS[_icon]
             break
-        elif scope.replace(',', '') in AVAILABLES_ICONS:
-            icon = scope.replace(',', '')
-            break
+        else:
+            for scope in yield_subscopes(sub_scope):
+                if scope.replace(',', '') in SCOPES:
+                    icon = scope.replace(',', '')
+                    break
+                else:
+                    icon = 'unknown'
 
-    logger.debug('Using icon "%s" for scope "%s"', icon, main_scope)
+    if file == 'LICENSE': icon = 'license'
+    logger.debug('Using icon "%s" for file %s', icon, file)
+
     return 'lang-%s' % icon
-
 
 def yield_subscopes(scope):
     last_dot = len(scope)
@@ -95,21 +138,27 @@ def sizehf(num):
     return "%.1f%s%s" % (num, 'Yi', 'B')
 
 
-def handle_activity(view, is_write=False):
+def handle_activity(view, is_write=False, idle=False):
     window = view.window()
     entity = view.file_name()
     if not (ipc and window and entity):
         return
 
+    act = base_activity()
+
     # TODO refactor these globals
     global last_file
     global last_edit
-    if last_file == entity and time.time() - last_edit < 59 and not is_write:
-        return
+    global stamp
+    if last_file != entity and settings.get('time_per_file'):
+        logger.info('adding new timestamp')
+        stamp = mktime(time.localtime())
 
     logger.info('Updating activity')
 
-    extension = os.path.splitext(entity)[1]
+    try: extension = entity.split('.')[len(entity.split('.')) - 1]
+    except: extension = ''
+
     language = os.path.splitext(os.path.basename(view.settings().get('syntax')))[0]
     if len(language) < 2:
         language += ' Syntax'
@@ -126,8 +175,6 @@ def handle_activity(view, is_write=False):
     last_file = entity
     last_edit = time.time()
 
-    act = base_activity()
-
     details_format = settings.get('details')
     if details_format:
         act['details'] = details_format.format(**format_dict)
@@ -136,17 +183,18 @@ def handle_activity(view, is_write=False):
     if state_format:
         act['state'] = state_format.format(**format_dict)
 
-    main_scope = view.scope_name(0).split()[0]
-    icon = get_icon(main_scope)
+    main_scope = view.scope_name(0)
+    icon = get_icon(format_dict['file'], format_dict['extension'], main_scope)
     if settings.get('big_icon'):
-        act['assets']['small_image'] = act['assets']['large_image']
-        act['assets']['small_text'] = act['assets']['large_text']
+        act['assets']['small_image'] = 'afk' if idle == True else act['assets']['small_image']
+        act['assets']['small_text'] = act['assets']['small_text']
         act['assets']['large_image'] = icon
         act['assets']['large_text'] = language
     elif settings.get('small_icon'):
         act['assets']['small_image'] = icon
         act['assets']['small_text'] = language
-
+    act['timestamps'] = {'start': stamp}
+    logger.info(window.folders())
     try:
         ipc.set_activity(act)
     except OSError as e:
@@ -226,8 +274,10 @@ def connect(silent=False, retry=True):
             sublime.set_timeout_async(connect_background, RECONNECT_DELAY)
         return
 
+    act = base_activity()
+    act['timestamps'] = {'start': start_time}
     try:
-        ipc.set_activity(base_activity())
+        ipc.set_activity(act)
     except OSError as e:
         handle_error(e, retry=retry)
         return
@@ -263,8 +313,20 @@ class DRPListener(sublime_plugin.EventListener):
 
     def on_modified_async(self, view):
         if is_view_active(view):
-            handle_activity(view)
+            if view.file_name() != last_file:
+                logger.info(last_file)
+                handle_activity(view)
 
+    def on_load_async(self, view):
+        handle_activity(view)
+
+    def on_close(self, view):
+        if view.window() == None:
+            logger.info('using idle presence')
+            act = base_activity()
+            act['timestamps'] = {'start': start_time}
+            try: ipc.set_activity(act)
+            except OSError as e: handle_error(e)
 
 class DiscordrpConnectCommand(sublime_plugin.ApplicationCommand):
 

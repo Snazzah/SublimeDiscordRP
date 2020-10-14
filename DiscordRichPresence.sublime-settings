@@ -1,6 +1,6 @@
 // DiscordRP Default Settings
 {
-    // Whether or not to connect to Discord on startup.
+    // Whether or not to connect to Discord on startup. 
     "connect_on_startup": true,
 
     // Specify log level. Valid are "ERROR", "WARNING", "INFO", "DEBUG".
@@ -29,11 +29,14 @@
     // Whether or not a timestamp for ST's start time should be included.
     "send_start_timestamp": true,
 
+    // Whether to change the timestamp when switching to/editing another file.
+    "time_per_file": true,
+
     // Whether or not to use the small icon (changes for every language) in the presence.
-    "small_icon": true,
+    "small_icon": false,
 
     // Use the language icon as the big icon, overrides 'small_icon'
-    "big_icon": false,
+    "big_icon": true,
 
     // Defines the order of name sources that should be used for the project name in format stings, if available.
     //

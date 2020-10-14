@@ -1,28 +1,20 @@
-<center>
-<img align="left" src="https://cdn.discordapp.com/app-assets/389368374645227520/389408211133923328.png">
-<h1>Sublime Discord Rich Presence</h1>
-</center>
-
-Discord Rich Presence for Sublime Text 3.  
-</br>
-<hr>
+# SublimeDiscordRP
+> 📄 Discord rich presence for Sublime Text.
 
 ## Preview
-
-|  User Modal  | Popout Modal
-| ------------ | ------------------------------------------
-| ![](https://get.ratelimited.today/fc30f4.png) | ![](https://get.ratelimited.today/c408bd.png)
-
+![](https://modeus.is-inside.me/O77P2hjS.png) ![](https://modeus.is-inside.me/vUbc3hc1.png)
+![](https://modeus.is-inside.me/nq9TArwi.png)  
 
 ## Installation
-
 The recommended installation method is to use [Package Control](https://packagecontrol.io/packages/Discord%20Rich%20Presence).
 
-![Animation of installation through Package Control](https://camo.githubusercontent.com/ff3df50a4bad4b83b2072550c1d8cf6f5d55d159/68747470733a2f2f692e696d6775722e636f6d2f737a7475474f572e676966)
-
-If for any reason you want to install the package manually, ensure that the package's folder is named `Discord Rich Presence`.
+`Preferences > Browse Packages` will take to the folder to git clone to.  
+`git clone https://github.com/Snazzah/SublimeDiscordRP "Discord Rich Presence"`
 
 ## Usage
+Use sublime normally. It should show the presence on your user!
 
-Open the Command Palette and select the <kbd>Discord Rich Presence: Connect to Discord</kbd> command.
-You should also check out the settings through <kbd>Preferences: Discord Rich Presence Settings</kbd>, where you can enable auto-connect.
+## Language/File Support 
+If for any reason something you use isn't supported, you can [open an issue.](https://github.com/Snazzah/SublimeDiscordRP/issues/new)  
+If requesting a new language/file please follow this format (though you don't have to): `Add <file/language name>`  
+The description have optionally have more info (image for icon reference (should be 512x512 minimum), language extensions).
