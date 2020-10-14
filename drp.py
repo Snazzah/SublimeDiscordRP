@@ -77,15 +77,9 @@ ICONS = {
     't': 'perl',
     'toml': 'toml',
     'ts': 'typescript',
-<<<<<<< HEAD
-    'txt': 'text',
-    'vue': 'vue',
-    'xml,svg': 'xml',
-=======
     'txt,rst,rest': 'text',
     'vue': 'vue',
     'xml,svg,yml,yaml': 'xml',
->>>>>>> 5cebcfa05a3b7220d643616a9cc08be9c77bf67b
 }
 
 # Scopes we can/should fallback to
