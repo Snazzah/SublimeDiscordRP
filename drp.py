@@ -31,7 +31,7 @@ def base_activity():
             'small_image': 'afk',
             'small_text': 'Idle',
             'large_image': 'sublime3',
-            'large_text': 'Sublime Text 3 v%s' % (sublime.version())
+            'large_text': 'Sublime Text v%s' % (sublime.version())
         },
         'state': settings.get('start_state')
     }
@@ -40,7 +40,7 @@ def base_activity():
             'large_image': 'afk',
             'large_text': 'Idle',
             'small_image': 'sublime3',
-            'small_text': 'Sublime Text 3 v%s' % (sublime.version())
+            'small_text': 'Sublime Text v%s' % (sublime.version())
         }
     return activity
 
