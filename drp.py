@@ -55,6 +55,7 @@ ICONS = {
     'css': 'css',
     'd': 'd',
     'dart': 'dart',
+    'ejs,tmpl': 'ejs',
     'ex,exs': 'elixir',
     'gitignore,gitattributes,gitmodules': 'git',
     'go': 'go',
