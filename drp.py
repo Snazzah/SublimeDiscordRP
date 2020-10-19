@@ -91,10 +91,6 @@ SCOPES = {
     'cs',
     'css',
     'd',
-    'html',
-    'java',
-    'json',
-    'perl'
     'erlang',
     'html',
     'java',
