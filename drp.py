@@ -72,14 +72,14 @@ ICONS = {
     'py': 'python',
     'rb': 'ruby',
     'rs': 'rust',
-    'sh': 'shell',
+    'sh,bat': 'shell',
     'swift': 'swift',
     't': 'perl',
     'toml': 'toml',
     'ts': 'typescript',
     'txt,rst,rest': 'text',
     'vue': 'vue',
-    'xml,svg,yml,yaml': 'xml',
+    'xml,svg,yml,yaml,cfg,ini': 'xml',
 }
 
 # Scopes we can/should fallback to
