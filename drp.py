@@ -26,6 +26,11 @@ stamp = start_time
 
 
 def base_activity():
+    """
+    Generate activity activity.
+
+    Args:
+    """
     activity = {
         'assets': {
             'small_image': 'afk',
@@ -104,6 +109,14 @@ SCOPES = {
 }
 
 def get_icon(file, ext, _scope):
+    """
+    Parse icon from file.
+
+    Args:
+        file: (str): write your description
+        ext: (str): write your description
+        _scope: (str): write your description
+    """
     main_scope = _scope.split()[0]
     base_scope = main_scope.split('.')[0]
     try:
@@ -129,6 +142,12 @@ def get_icon(file, ext, _scope):
     return 'lang-%s' % icon
 
 def yield_subscopes(scope):
+    """
+    Yield all subscopes of the given scope.
+
+    Args:
+        scope: (str): write your description
+    """
     last_dot = len(scope)
     while last_dot > 0:
         yield scope[:last_dot]
@@ -136,6 +155,12 @@ def yield_subscopes(scope):
 
 
 def sizehf(num):
+    """
+    Returns human - readable size.
+
+    Args:
+        num: (int): write your description
+    """
     for unit in ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z']:
         if abs(num) < 1024.0:
             return "%3.1f%s%s" % (num, unit, 'B')
@@ -144,6 +169,14 @@ def sizehf(num):
 
 
 def handle_activity(view, is_write=False, idle=False):
+    """
+    Handle the activity
+
+    Args:
+        view: (todo): write your description
+        is_write: (bool): write your description
+        idle: (todo): write your description
+    """
     window = view.window()
     entity = view.file_name()
     if not (ipc and window and entity):
@@ -207,6 +240,13 @@ def handle_activity(view, is_write=False, idle=False):
 
 
 def handle_error(exc, retry=True):
+    """
+    Dispatches error.
+
+    Args:
+        exc: (todo): write your description
+        retry: (todo): write your description
+    """
     sublime.active_window().status_message("[DiscordRP] Sending activity failed")
     logger.error("Sending activity failed. Error: %s", exc)
     disconnect()
@@ -218,6 +258,13 @@ def handle_error(exc, retry=True):
 
 
 def get_project_name(window, current_file):
+    """
+    Get the name of the current project
+
+    Args:
+        window: (todo): write your description
+        current_file: (str): write your description
+    """
     sources = settings.get("project_name", [])
     for source in sources:
         if source == "project_folder_name":
@@ -240,6 +287,13 @@ def get_project_name(window, current_file):
 
 
 def find_folder_containing_file(folders, current_file):
+    """
+    Finds the folder in - place in a folder.
+
+    Args:
+        folders: (str): write your description
+        current_file: (str): write your description
+    """
     for folder in folders:
         real_folder = os.path.realpath(folder)
         if os.path.realpath(current_file).startswith(real_folder):
@@ -248,6 +302,12 @@ def find_folder_containing_file(folders, current_file):
 
 
 def is_view_active(view):
+    """
+    Return true if the current window is active.
+
+    Args:
+        view: (todo): write your description
+    """
     if view:
         active_window = sublime.active_window()
         if active_window:
@@ -258,6 +318,13 @@ def is_view_active(view):
 
 
 def connect(silent=False, retry=True):
+    """
+    Establish a connection.
+
+    Args:
+        silent: (bool): write your description
+        retry: (bool): write your description
+    """
     global ipc
     if ipc:
         logger.error("Already connected")
@@ -291,6 +358,11 @@ def connect(silent=False, retry=True):
 
 
 def connect_background():
+    """
+    Connects a connection to the background.
+
+    Args:
+    """
     if not is_connecting:
         logger.warning("Automatic connection retry aborted")
         return
@@ -301,6 +373,11 @@ def connect_background():
 
 
 def disconnect():
+    """
+    Disconnect from the connection
+
+    Args:
+    """
     global ipc
     if ipc:
         try:
@@ -314,18 +391,46 @@ def disconnect():
 class DRPListener(sublime_plugin.EventListener):
 
     def on_post_save_async(self, view):
+        """
+        Called when the activity is created.
+
+        Args:
+            self: (todo): write your description
+            view: (todo): write your description
+        """
         handle_activity(view, is_write=True)
 
     def on_modified_async(self, view):
+        """
+        Called when the user is modified.
+
+        Args:
+            self: (todo): write your description
+            view: (todo): write your description
+        """
         if is_view_active(view):
             if view.file_name() != last_file:
                 logger.info(last_file)
                 handle_activity(view)
 
     def on_load_async(self, view):
+        """
+        Loads the given view isync.
+
+        Args:
+            self: (todo): write your description
+            view: (str): write your description
+        """
         handle_activity(view)
 
     def on_close(self, view):
+        """
+        Closes the current window.
+
+        Args:
+            self: (todo): write your description
+            view: (todo): write your description
+        """
         if view.window() == None:
             logger.info('using idle presence')
             act = base_activity()
@@ -336,24 +441,60 @@ class DRPListener(sublime_plugin.EventListener):
 class DiscordrpConnectCommand(sublime_plugin.ApplicationCommand):
 
     def is_enabled(self):
+        """
+        Return true if the ip is enabled false otherwise.
+
+        Args:
+            self: (todo): write your description
+        """
         return not bool(ipc)
 
     def run(self):
+        """
+        Run the asyncioio.
+
+        Args:
+            self: (todo): write your description
+        """
         sublime.set_timeout_async(self.run_async)
 
     def run_async(self):
+        """
+        Runs the asyncio.
+
+        Args:
+            self: (todo): write your description
+        """
         connect()
 
 
 class DiscordrpReconnectCommand(sublime_plugin.ApplicationCommand):
 
     def is_enabled(self):
+        """
+        Return true if the ip is enabled false otherwise.
+
+        Args:
+            self: (todo): write your description
+        """
         return bool(ipc)
 
     def run(self):
+        """
+        Run the asyncioio.
+
+        Args:
+            self: (todo): write your description
+        """
         sublime.set_timeout_async(self.run_async)
 
     def run_async(self):
+        """
+        Run the asyncio.
+
+        Args:
+            self: (todo): write your description
+        """
         disconnect()
         connect()
 
@@ -361,18 +502,41 @@ class DiscordrpReconnectCommand(sublime_plugin.ApplicationCommand):
 class DiscordrpDisconnectCommand(sublime_plugin.ApplicationCommand):
 
     def is_enabled(self):
+        """
+        Return true if the given ip is enabled.
+
+        Args:
+            self: (todo): write your description
+        """
         return bool(ipc) or is_connecting
 
     def run(self):
+        """
+        Run the asyncioio.
+
+        Args:
+            self: (todo): write your description
+        """
         sublime.set_timeout_async(self.run_async)
 
     def run_async(self):
+        """
+        Runs the coroutine.
+
+        Args:
+            self: (todo): write your description
+        """
         global is_connecting
         is_connecting = False
         disconnect()
 
 
 def plugin_loaded():
+    """
+    Perform the plugin.
+
+    Args:
+    """
     global settings
     settings = sublime.load_settings(SETTINGS_FILE)
     if settings.get('connect_on_startup'):
@@ -380,6 +544,11 @@ def plugin_loaded():
 
 
 def plugin_unloaded():
+    """
+    Unloaded unloaded
+
+    Args:
+    """
     global is_connecting
     is_connecting = False
     disconnect()

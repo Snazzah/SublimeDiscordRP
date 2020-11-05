@@ -40,6 +40,13 @@ class DiscordIpcClient(metaclass=ABCMeta):
     """
 
     def __init__(self, client_id):
+        """
+        Initialize a client.
+
+        Args:
+            self: (todo): write your description
+            client_id: (str): write your description
+        """
         self.client_id = client_id
         self._connect()
         self._do_handshake()
@@ -47,6 +54,16 @@ class DiscordIpcClient(metaclass=ABCMeta):
 
     @classmethod
     def for_platform(cls, client_id, platform=sys.platform):
+        """
+        Return an instance of a client.
+
+        Args:
+            cls: (todo): write your description
+            client_id: (str): write your description
+            platform: (list): write your description
+            sys: (todo): write your description
+            platform: (list): write your description
+        """
         if platform == 'win32':
             return WinDiscordIpcClient(client_id)
         else:
@@ -54,9 +71,21 @@ class DiscordIpcClient(metaclass=ABCMeta):
 
     @abstractmethod
     def _connect(self):
+        """
+        Connects to the server.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def _do_handshake(self):
+        """
+        Perform a master handshake.
+
+        Args:
+            self: (todo): write your description
+        """
         ret_op, ret_data = self.send_recv({'v': 1, 'client_id': self.client_id}, op=OP_HANDSHAKE)
         # {'cmd': 'DISPATCH', 'data': {'v': 1, 'config': {...}}, 'evt': 'READY', 'nonce': None}
         if ret_op == OP_FRAME and ret_data['cmd'] == 'DISPATCH' and ret_data['evt'] == 'READY':
@@ -68,17 +97,44 @@ class DiscordIpcClient(metaclass=ABCMeta):
 
     @abstractmethod
     def _write(self, date: bytes):
+        """
+        Writes bytes to the given date.
+
+        Args:
+            self: (todo): write your description
+            date: (todo): write your description
+        """
         pass
 
     @abstractmethod
     def _recv(self, size: int) -> bytes:
+        """
+        Receive a number of size.
+
+        Args:
+            self: (todo): write your description
+            size: (int): write your description
+        """
         pass
 
     def _recv_header(self) -> (int, int):
+        """
+        Recv_header header.
+
+        Args:
+            self: (todo): write your description
+        """
         header = self._recv_exactly(8)
         return struct.unpack("<II", header)
 
     def _recv_exactly(self, size) -> bytes:
+        """
+        Recieve bytes from the socket.
+
+        Args:
+            self: (todo): write your description
+            size: (int): write your description
+        """
         buf = b""
         size_remaining = size
         while size_remaining:
@@ -88,6 +144,12 @@ class DiscordIpcClient(metaclass=ABCMeta):
         return buf
 
     def close(self):
+        """
+        Close the connection.
+
+        Args:
+            self: (todo): write your description
+        """
         logger.warning("closing connection")
         try:
             self.send({}, op=OP_CLOSE)
@@ -96,15 +158,43 @@ class DiscordIpcClient(metaclass=ABCMeta):
 
     @abstractmethod
     def _close(self):
+        """
+        Closes the underlying connection.
+
+        Args:
+            self: (todo): write your description
+        """
         pass
 
     def __enter__(self):
+        """
+        Decor function.
+
+        Args:
+            self: (todo): write your description
+        """
         return self
 
     def __exit__(self, *_):
+        """
+        Called when exit.
+
+        Args:
+            self: (todo): write your description
+            _: (todo): write your description
+        """
         self.close()
 
     def send_recv(self, data, *, op=OP_FRAME):
+        """
+        Send a message to the socket.
+
+        Args:
+            self: (todo): write your description
+            data: (dict): write your description
+            op: (str): write your description
+            OP_FRAME: (str): write your description
+        """
         nonce = data.get('nonce')
         self.send(data, op=op)
         while True:
@@ -117,6 +207,15 @@ class DiscordIpcClient(metaclass=ABCMeta):
         return
 
     def send(self, data, *, op=OP_FRAME):
+        """
+        Send data to the server.
+
+        Args:
+            self: (todo): write your description
+            data: (todo): write your description
+            op: (str): write your description
+            OP_FRAME: (str): write your description
+        """
         logger.debug("sending %s", data)
         data_str = json.dumps(data, separators=(',', ':'))
         data_bytes = data_str.encode('utf-8')
@@ -136,6 +235,13 @@ class DiscordIpcClient(metaclass=ABCMeta):
         return op, data
 
     def set_activity(self, act):
+        """
+        Set activity
+
+        Args:
+            self: (todo): write your description
+            act: (todo): write your description
+        """
         data = {
             'cmd': 'SET_ACTIVITY',
             'args': {'pid': os.getpid(),
@@ -145,6 +251,12 @@ class DiscordIpcClient(metaclass=ABCMeta):
         return self.send_recv(data)
 
     def clear_activity(self):
+        """
+        Clear activity activity.
+
+        Args:
+            self: (todo): write your description
+        """
         data = {
             'cmd': 'SET_ACTIVITY',
             'args': {'pid': os.getpid()},
@@ -158,6 +270,12 @@ class WinDiscordIpcClient(DiscordIpcClient):
     _pipe_pattern = R'\\?\pipe\discord-ipc-{}'
 
     def _connect(self):
+        """
+        Connect to a connection.
+
+        Args:
+            self: (todo): write your description
+        """
         for i in range(10):
             path = self._pipe_pattern.format(i)
             logger.debug("Attempting to open %r", path)
@@ -173,19 +291,45 @@ class WinDiscordIpcClient(DiscordIpcClient):
         self.path = path
 
     def _write(self, data: bytes):
+        """
+        Write bytes to the transport.
+
+        Args:
+            self: (todo): write your description
+            data: (todo): write your description
+        """
         self._f.write(data)
         self._f.flush()
 
     def _recv(self, size: int) -> bytes:
+        """
+        Receive a number of bytes from the socket.
+
+        Args:
+            self: (todo): write your description
+            size: (int): write your description
+        """
         return self._f.read(size)
 
     def _close(self):
+        """
+        Close the connection.
+
+        Args:
+            self: (todo): write your description
+        """
         self._f.close()
 
 
 class UnixDiscordIpcClient(DiscordIpcClient):
 
     def _connect(self):
+        """
+        Connect to a connection.
+
+        Args:
+            self: (todo): write your description
+        """
         self._sock = socket.socket(socket.AF_UNIX)
 
         for path in self._iter_path_candidates():
@@ -206,6 +350,11 @@ class UnixDiscordIpcClient(DiscordIpcClient):
 
     @staticmethod
     def _iter_path_candidates():
+        """
+        Iterate over candidate paths.
+
+        Args:
+        """
         env_keys = ('XDG_RUNTIME_DIR', 'TMPDIR', 'TMP', 'TEMP')
         for env_key in env_keys:
             dir_path = os.environ.get(env_key)
@@ -223,10 +372,30 @@ class UnixDiscordIpcClient(DiscordIpcClient):
             yield os.path.join(dir_path, "discord-ipc-{}".format(i))
 
     def _write(self, data: bytes):
+        """
+        Write data to the socket.
+
+        Args:
+            self: (todo): write your description
+            data: (todo): write your description
+        """
         self._sock.sendall(data)
 
     def _recv(self, size: int) -> bytes:
+        """
+        Receive a number of bytes from the socket.
+
+        Args:
+            self: (todo): write your description
+            size: (int): write your description
+        """
         return self._sock.recv(size)
 
     def _close(self):
+        """
+        Close the connection.
+
+        Args:
+            self: (todo): write your description
+        """
         self._sock.close()
