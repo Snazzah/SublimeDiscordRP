@@ -71,6 +71,7 @@ ICONS = {
     'php': 'php',
     'png,jpg,jpeg,jfif,gif,webp': 'image',
     'py': 'python',
+    'p,sp': 'pawn',
     'rb': 'ruby',
     'rs': 'rust',
     'sh,bat': 'shell',
@@ -326,7 +327,7 @@ class DRPListener(sublime_plugin.EventListener):
         handle_activity(view)
 
     def on_close(self, view):
-        if view.window() == None:
+        if view.window() == None and ipc != None:
             logger.info('using idle presence')
             act = base_activity()
             act['timestamps'] = {'start': start_time}
