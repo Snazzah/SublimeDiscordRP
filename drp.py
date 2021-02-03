@@ -70,7 +70,7 @@ ICONS = {
     'md': 'markdown',
     'php': 'php',
     'png,jpg,jpeg,jfif,gif,webp': 'image',
-    'py': 'python',
+    'py,pyx': 'python',
     'p,sp': 'pawn',
     'rb': 'ruby',
     'rs': 'rust',
