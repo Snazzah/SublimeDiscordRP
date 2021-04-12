@@ -331,11 +331,15 @@ class DRPListener(sublime_plugin.EventListener):
         handle_activity(view)
 
     def on_close(self, view):
-        if view.window() == None and ipc != None:
-            logger.info('using idle presence')
-            act = base_activity()
-            act['timestamps'] = {'start': start_time}
-            try: ipc.set_activity(act)
+        active_window = sublime.active_window()
+        if active_window:
+            active_view = active_window.active_view()
+            if active_view: handle_activity(active_view)
+            elif ipc != None:
+                try: ipc.set_activity(base_activity())
+                except OSError as e: handle_error(e)
+        elif ipc != None:
+            try: ipc.set_activity(base_activity())
             except OSError as e: handle_error(e)
 
 class DiscordrpConnectCommand(sublime_plugin.ApplicationCommand):
