@@ -25,7 +25,7 @@ start_time = mktime(time.localtime())
 stamp = start_time
 
 
-def base_activity():
+def base_activity(started = False):
     activity = {
         'assets': {
             'small_image': 'afk',
@@ -33,7 +33,7 @@ def base_activity():
             'large_image': 'sublime3',
             'large_text': 'Sublime Text v%s' % (sublime.version())
         },
-        'state': settings.get('start_state')
+        'state': settings.get('start_state') if started else 'Idle'
     }
     if settings.get('big_icon'):
         activity['assets'] = {
@@ -211,6 +211,14 @@ def handle_activity(view, is_write=False, idle=False):
         handle_error(e)
 
 
+def reset_activity(started = False):
+    if not ipc:
+        return
+    last_file = ''
+    try: ipc.set_activity(base_activity(started))
+    except OSError as e: handle_error(e)
+
+
 def handle_error(exc, retry=True):
     sublime.active_window().status_message("[DiscordRP] Sending activity failed")
     logger.error("Sending activity failed. Error: %s", exc)
@@ -284,7 +292,7 @@ def connect(silent=False, retry=True):
             sublime.set_timeout_async(connect_background, RECONNECT_DELAY)
         return
 
-    act = base_activity()
+    act = base_activity(True)
     act['timestamps'] = {'start': start_time}
     try:
         ipc.set_activity(act)
@@ -324,7 +332,7 @@ class DRPListener(sublime_plugin.EventListener):
     def on_modified_async(self, view):
         if is_view_active(view):
             if view.file_name() != last_file:
-                logger.info(last_file)
+                logger.info("Setting presence to file %r from %r", view.file_name(), last_file)
                 handle_activity(view)
 
     def on_load_async(self, view):
@@ -335,12 +343,8 @@ class DRPListener(sublime_plugin.EventListener):
         if active_window:
             active_view = active_window.active_view()
             if active_view: handle_activity(active_view)
-            elif ipc != None:
-                try: ipc.set_activity(base_activity())
-                except OSError as e: handle_error(e)
-        elif ipc != None:
-            try: ipc.set_activity(base_activity())
-            except OSError as e: handle_error(e)
+            else: reset_activity()
+        else: reset_activity()
 
 class DiscordrpConnectCommand(sublime_plugin.ApplicationCommand):
 
