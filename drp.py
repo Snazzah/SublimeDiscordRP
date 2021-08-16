@@ -83,7 +83,8 @@ ICONS = {
     'txt,rst,rest': 'text',
     'vue': 'vue',
     'xml,svg,yml,yaml,cfg,ini': 'xml',
-    'yar,yara': 'yara'
+    'yar,yara': 'yara',
+    'pp,pas,inc': 'pascal'
 }
 
 # Scopes we can/should fallback to
@@ -105,7 +106,8 @@ SCOPES = {
     'pawn',
     'python',
     'scala',
-    'yara'
+    'yara',
+    'pascal'
 }
 
 def get_icon(file, ext, _scope):
