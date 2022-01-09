@@ -2,8 +2,8 @@
 > 📄 Discord rich presence for Sublime Text.
 
 ## Preview
-![](https://modeus.is-inside.me/O77P2hjS.png) ![](https://modeus.is-inside.me/vUbc3hc1.png)
-![](https://modeus.is-inside.me/nq9TArwi.png)  
+![](https://safe.kashima.moe/1es45l5hk6tu.png) ![](https://safe.kashima.moe/mbm05x2z9yfn.png)  
+![](https://safe.kashima.moe/47cf371te8sv.png)  
 
 ## Installation
 The recommended installation method is to use [Package Control](https://packagecontrol.io/packages/Discord%20Rich%20Presence).
