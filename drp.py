@@ -50,6 +50,7 @@ ICONS = {
     'asm': 'assembly',
     'c,h': 'c',
     'clj,cljs,edn': 'clojure',
+    'coffeescript,coffee': 'coffeescript',
     'cpp,hpp': 'cpp',
     'cr': 'crystal',
     'cs': 'cs',
