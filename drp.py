@@ -49,6 +49,7 @@ def base_activity(started = False):
 ICONS = {
     'asm': 'assembly',
     'c,h': 'c',
+    'clj,cljs,edn': 'clojure',
     'cpp,hpp': 'cpp',
     'cr': 'crystal',
     'cs': 'cs',
@@ -90,6 +91,7 @@ ICONS = {
 SCOPES = {
     'assembly',
     'c',
+    'clojure',
     'cpp',
     'cs',
     'css',
