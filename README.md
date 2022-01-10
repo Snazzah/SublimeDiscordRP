@@ -2,7 +2,7 @@
 > 📄 Discord rich presence for Sublime Text.
 
 ## Preview
-![](https://safe.kashima.moe/1es45l5hk6tu.png) ![](https://safe.kashima.moe/mbm05x2z9yfn.png)  
+![](https://safe.kashima.moe/1es45l5hk6tu.png) ![](https://safe.kashima.moe/mbm05x2z9yfn.png)
 ![](https://safe.kashima.moe/47cf371te8sv.png)  
 
 ## Installation
