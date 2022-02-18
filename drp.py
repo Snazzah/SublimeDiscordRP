@@ -63,6 +63,7 @@ ICONS = {
     'go': 'go',
     'hs': 'haskell',
     'htm,html,mhtml': 'html',
+    'j2,jinja,jinja2': 'jinja',
     'java,class,properties': 'java',
     'js': 'javascript',
     'json': 'json',
