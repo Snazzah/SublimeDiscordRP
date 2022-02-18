@@ -111,7 +111,8 @@ SCOPES = {
     'python',
     'scala',
     'yara',
-    'pascal'
+    'pascal',
+    'v'
 }
 
 def get_icon(file, ext, _scope):
@@ -177,7 +178,7 @@ def handle_activity(view, is_write=False, idle=False):
 
     language = os.path.splitext(os.path.basename(view.settings().get('syntax')))[0]
     if len(language) < 2:
-        language += ' Syntax'
+        language = language.upper() + ' Syntax'
     format_dict = dict(
         file=os.path.basename(entity),
         extension=extension,
