@@ -61,6 +61,7 @@ ICONS = {
     'ex,exs': 'elixir',
     'gitignore,gitattributes,gitmodules': 'git',
     'go': 'go',
+    'ml,mli,mll,mly': 'ocaml',
     'hs': 'haskell',
     'htm,html,mhtml': 'html',
     'j2,jinja,jinja2': 'jinja',
@@ -112,6 +113,7 @@ SCOPES = {
     'scala',
     'yara',
     'pascal',
+    'ocaml',
     'v'
 }
 
