@@ -51,7 +51,7 @@ ICONS = {
     'c,h': 'c',
     'clj,cljs,edn': 'clojure',
     'coffeescript,coffee': 'coffeescript',
-    'cpp,hpp': 'cpp',
+    'cpp,hpp,cc': 'cpp',
     'cr': 'crystal',
     'cs': 'cs',
     'css': 'css',
