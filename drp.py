@@ -48,6 +48,7 @@ def base_activity(started = False):
 # List of extensions mapped to language names.
 ICONS = {
     'asm': 'assembly',
+    'ahk': 'ahk',
     'c,h': 'c',
     'clj,cljs,edn': 'clojure',
     'coffeescript,coffee': 'coffeescript',
