@@ -95,6 +95,7 @@ ICONS = {
 # Scopes we can/should fallback to
 SCOPES = {
     'assembly',
+    'ahk',
     'c',
     'clojure',
     'cpp',
