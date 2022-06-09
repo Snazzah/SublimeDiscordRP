@@ -119,7 +119,8 @@ SCOPES = {
     'yara',
     'pascal',
     'ocaml',
-    'v'
+    'v',
+    'nitecode'
 }
 
 def get_icon(file, ext, _scope):
