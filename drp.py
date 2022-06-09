@@ -90,7 +90,8 @@ ICONS = {
     'vue': 'vue',
     'xml,svg,yml,yaml,cfg,ini': 'xml',
     'yar,yara': 'yara',
-    'pp,pas,inc': 'pascal'
+    'pp,pas,inc': 'pascal',
+    'nite,nitecode,nightcode,nc': 'nitecode'
 }
 
 # Scopes we can/should fallback to
