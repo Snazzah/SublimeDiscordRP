@@ -150,7 +150,7 @@ def get_icon(file, ext, _scope):
     if file == 'LICENSE': icon = 'license'
     logger.debug('Using icon "%s" for file %s (scope: %s)', icon, file, main_scope)
 
-    return 'lang-%s' % icon
+    return 'https://raw.githubusercontent.com/Snazzah/SublimeDiscordRP/master/icons/lang-%s.png' % icon
 
 def yield_subscopes(scope):
     last_dot = len(scope)
