@@ -91,6 +91,8 @@ ICONS = {
     'xml,svg,yml,yaml,cfg,ini': 'xml',
     'yar,yara': 'yara',
     'pp,pas,inc': 'pascal',
+    'scss,sass': 'sass',
+    'nim': 'nim',
     'nite,nitecode,nightcode,nc': 'nitecode'
 }
 
@@ -120,6 +122,8 @@ SCOPES = {
     'pascal',
     'ocaml',
     'v',
+    'sass',
+    'nim',
     'nitecode'
 }
 
