@@ -93,7 +93,8 @@ ICONS = {
     'pp,pas,inc': 'pascal',
     'scss,sass': 'sass',
     'nim': 'nim',
-    'nite,nitecode,nightcode,nc': 'nitecode'
+    'nite,nitecode,nightcode,nc': 'nitecode',
+    'p6,pm6,pod6,raku,rakumod,rakudoc,rakutest,nqp,crotmp': 'raku'
 }
 
 # Scopes we can/should fallback to
@@ -124,7 +125,8 @@ SCOPES = {
     'v',
     'sass',
     'nim',
-    'nitecode'
+    'nitecode',
+    'raku'
 }
 
 def get_icon(file, ext, _scope):
