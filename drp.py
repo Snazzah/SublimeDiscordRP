@@ -92,7 +92,8 @@ ICONS = {
     'yar,yara': 'yara',
     'pp,pas,inc': 'pascal',
     'scss,sass': 'sass',
-    'nim': 'nim'
+    'nim': 'nim',
+    'nite,nitecode,nightcode,nc': 'nitecode'
 }
 
 # Scopes we can/should fallback to
@@ -122,7 +123,8 @@ SCOPES = {
     'ocaml',
     'v',
     'sass',
-    'nim'
+    'nim',
+    'nitecode'
 }
 
 def get_icon(file, ext, _scope):
