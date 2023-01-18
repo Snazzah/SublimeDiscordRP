@@ -319,7 +319,9 @@ def connect(silent=False, retry=True):
         return
 
     act = base_activity(True)
-    act['timestamps'] = {'start': start_time}
+    if settings.get('show_elapsed_time'):
+        act['timestamps'] = {'start': start_time}
+
     try:
         ipc.set_activity(act)
     except OSError as e:
