@@ -129,6 +129,7 @@ SCOPES = {
     'raku'
 }
 
+
 def get_icon(file, ext, _scope):
     main_scope = _scope.split()[0]
     base_scope = main_scope.split('.')[0]
@@ -153,6 +154,7 @@ def get_icon(file, ext, _scope):
     logger.debug('Using icon "%s" for file %s (scope: %s)', icon, file, main_scope)
 
     return 'https://raw.githubusercontent.com/Snazzah/SublimeDiscordRP/master/icons/lang-%s.png' % icon
+
 
 def yield_subscopes(scope):
     last_dot = len(scope)
@@ -224,7 +226,10 @@ def handle_activity(view, is_write=False, idle=False):
     elif settings.get('small_icon'):
         act['assets']['small_image'] = icon
         act['assets']['small_text'] = language
-    act['timestamps'] = {'start': stamp}
+
+    if settings.get('show_elapsed_time'):
+        act['timestamps'] = {'start': stamp}
+
     logger.info(window.folders())
     try:
         ipc.set_activity(act)
@@ -366,6 +371,7 @@ class DRPListener(sublime_plugin.EventListener):
             if active_view: handle_activity(active_view)
             else: reset_activity()
         else: reset_activity()
+
 
 class DiscordrpConnectCommand(sublime_plugin.ApplicationCommand):
 

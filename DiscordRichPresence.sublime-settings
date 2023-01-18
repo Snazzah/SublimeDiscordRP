@@ -32,6 +32,9 @@
     // Whether to change the timestamp when switching to/editing another file.
     "time_per_file": true,
 
+    // Whether or not to show the elapsed time
+    "show_elapsed_time": true,
+
     // Whether or not to use the small icon (changes for every language) in the presence.
     "small_icon": false,
 
