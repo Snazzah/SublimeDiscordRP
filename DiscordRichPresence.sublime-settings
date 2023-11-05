@@ -45,7 +45,7 @@
     "git_repository_button": false,
 
     // Default message for git repository button (supports format)
-    "git_repository_message": "Git Repository",
+    "git_repository_message": "Open Repository",
 
     // Defines the order of name sources that should be used for the project name in format stings, if available.
     //
