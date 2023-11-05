@@ -2,6 +2,7 @@ from functools import partial
 import logging
 import os
 import time
+import re
 from time import mktime
 
 import sublime
@@ -230,6 +231,13 @@ def handle_activity(view, is_write=False, idle=False):
     if settings.get('show_elapsed_time'):
         act['timestamps'] = {'start': stamp}
 
+    if settings.get('git_repository_button'):
+        git_url = get_git_url(window)
+        git_btn_format = settings.get('git_repository_message')
+
+        if git_btn_format and git_url is not None:
+            act['buttons'] = [{'label': git_btn_format.format(**format_dict), 'url': git_url}]
+
     logger.info(window.folders())
     try:
         ipc.set_activity(act)
@@ -254,6 +262,20 @@ def handle_error(exc, retry=True):
         global is_connecting
         is_connecting = True
         sublime.set_timeout_async(connect_background, 0)
+
+
+def get_git_url(window):
+    for folder in window.folders():
+        f = open(folder+"/.git/config", "r")
+        if (f):
+            filteredConfig = ''.join(f.read().split())
+            ma = re.search("\[remote\"origin\"\]url=(.*)\.git", filteredConfig)
+            if ma is None:
+                continue
+
+            return ma.group(1)
+
+    return None
 
 
 def get_project_name(window, current_file):
