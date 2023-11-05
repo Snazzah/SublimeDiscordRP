@@ -266,8 +266,10 @@ def handle_error(exc, retry=True):
 
 def get_git_url(window):
     for folder in window.folders():
-        f = open(folder+"/.git/config", "r")
-        if (f):
+        gitcfg_path = folder+"/.git/config"
+
+        if (os.path.exists(gitcfg_path)):
+            f = open(gitcfg_path, "r")
             filteredConfig = ''.join(f.read().split())
             ma = re.search("\[remote\"origin\"\]url=(.*)\.git", filteredConfig)
             if ma is None:
