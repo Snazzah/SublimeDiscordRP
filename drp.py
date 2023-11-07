@@ -265,19 +265,65 @@ def handle_error(exc, retry=True):
         sublime.set_timeout_async(connect_background, 0)
 
 
+def git_config_parser(path):
+    obj = dict()
+    with open(path) as cfg:
+        lines = cfg.read().split("\n")
+        current_section = None
+
+        for line in lines:
+            # remove comments and spaces
+            line = re.sub(" |;(.*)|#(.*)", "", line)
+            if not line:
+                continue
+
+            if line.startswith("["):
+                res = re.search('"(.*)"', line)
+                if res is not None:
+                    sec_name = re.sub('\[|"(.*)"|\]', "", line)
+                    subsec_name = res.group(1)
+                    if sec_name not in obj:
+                        obj[sec_name] = {}
+
+                    obj[sec_name][subsec_name] = {}
+                    current_section = [sec_name, subsec_name]
+                else:
+                    sec_name = re.sub("\[|\]", "", line)
+                    obj[sec_name] = {}
+                    current_section = [sec_name]
+
+            else:
+                parts = re.sub("\t|\0", "",line).split("=")
+                if len(current_section) < 2:
+                    obj[current_section[0]][parts[0]] = parts[1]
+                else:
+                    obj[current_section[0]][current_section[1]][parts[0]] = parts[1]
+
+    return obj
+
+
+def get_git_url_from_config(folder):
+    gitcfg_path = folder+"/.git/config"
+    if os.path.exists(gitcfg_path):
+        cfg = git_config_parser(gitcfg_path)
+        return cfg["remote"]["origin"]["url"]
+
+    return None
+
+
 def get_git_url(window):
-    subl_variables = window.extract_variables()
-    url = None
+    for folder in window.folders():
+        url = None
+        try:
+            url = subprocess.check_output(["git", "-C", folder, "remote", "get-url", "origin"], universal_newlines=True)
+        except:
+            url = get_git_url_from_config(folder)
 
-    try:
-        url = subprocess.check_output(["git", "-C", subl_variables["folder"], "remote", "get-url", "origin"], universal_newlines=True)
-    except:
-        pass
-        #get_git_url_from_config(window)
+        if url is not None:
+            url = re.sub("\.git\n?$", "", url)
+            return url
 
-    if url is not None:
-        url = url.replace(".git\n", "")
-    return url
+    return None
 
 
 def get_project_name(window, current_file):
