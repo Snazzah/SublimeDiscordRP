@@ -3,6 +3,7 @@ import logging
 import os
 import time
 import re
+import subprocess
 from time import mktime
 
 import sublime
@@ -265,19 +266,18 @@ def handle_error(exc, retry=True):
 
 
 def get_git_url(window):
-    for folder in window.folders():
-        gitcfg_path = folder+"/.git/config"
+    subl_variables = window.extract_variables()
+    url = None
 
-        if (os.path.exists(gitcfg_path)):
-            f = open(gitcfg_path, "r")
-            filteredConfig = ''.join(f.read().split())
-            ma = re.search("\[remote\"origin\"\]url=(.*)\.git", filteredConfig)
-            if ma is None:
-                continue
+    try:
+        url = subprocess.check_output(["git", "-C", subl_variables["folder"], "remote", "get-url", "origin"], universal_newlines=True)
+    except:
+        pass
+        #get_git_url_from_config(window)
 
-            return ma.group(1)
-
-    return None
+    if url is not None:
+        url = url.replace(".git\n", "")
+    return url
 
 
 def get_project_name(window, current_file):
