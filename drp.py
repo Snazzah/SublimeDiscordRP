@@ -311,6 +311,19 @@ def get_git_url_from_config(folder):
     return None
 
 
+def parse_git_url(url):
+    url = re.sub("\.git\n?$", "", url)
+    if url.startswith("https"):
+        return url
+
+    elif url.startswith("git@") or url.startswith("ssh"):
+        url = url.replace(":", "/")
+        return re.sub("git@|ssh///", "https://", url)
+
+    else:
+        return None
+
+
 def get_git_url(window):
     for folder in window.folders():
         url = None
@@ -320,7 +333,7 @@ def get_git_url(window):
             url = get_git_url_from_config(folder)
 
         if url is not None:
-            url = re.sub("\.git\n?$", "", url)
+            url = parse_git_url(url)
             return url
 
     return None
