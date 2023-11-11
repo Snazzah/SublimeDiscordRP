@@ -306,7 +306,8 @@ def get_git_url_from_config(folder):
     gitcfg_path = folder+"/.git/config"
     if os.path.exists(gitcfg_path):
         cfg = git_config_parser(gitcfg_path)
-        return cfg["remote"]["origin"]["url"]
+        if "remote" in cfg and "origin" in cfg["remote"]:
+            return cfg["remote"]["origin"]["url"]
 
     return None
 
