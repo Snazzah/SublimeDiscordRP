@@ -329,7 +329,7 @@ def get_git_url(window):
     for folder in window.folders():
         url = None
         try:
-            url = subprocess.check_output(["git", "-C", folder, "remote", "get-url", "origin"], universal_newlines=True)
+            url = subprocess.check_output(["git", "-C", folder, "remote", "get-url", "origin"], universal_newlines=True, creationflags=subprocess.CREATE_NO_WINDOW)
         except:
             url = get_git_url_from_config(folder)
 
