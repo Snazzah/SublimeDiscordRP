@@ -233,7 +233,7 @@ def handle_activity(view, is_write=False, idle=False):
         act['timestamps'] = {'start': stamp}
 
     if settings.get('git_repository_button'):
-        git_url = get_git_url(window)
+        git_url = get_git_url(entity)
         git_btn_format = settings.get('git_repository_message')
 
         if git_btn_format and git_url is not None:
@@ -325,17 +325,17 @@ def parse_git_url(url):
         return None
 
 
-def get_git_url(window):
-    for folder in window.folders():
-        url = None
-        try:
-            url = subprocess.check_output(["git", "-C", folder, "remote", "get-url", "origin"], universal_newlines=True, creationflags=subprocess.CREATE_NO_WINDOW)
-        except:
-            url = get_git_url_from_config(folder)
+def get_git_url(entity):
+    folder = os.path.dirname(entity)
+    url = None
+    try:
+        url = subprocess.check_output(["git", "-C", folder, "remote", "get-url", "origin"], universal_newlines=True, creationflags=subprocess.CREATE_NO_WINDOW)
+    except:
+        url = get_git_url_from_config(folder)
 
-        if url is not None:
-            url = parse_git_url(url)
-            return url
+    if url is not None:
+        url = parse_git_url(url)
+        return url
 
     return None
 
