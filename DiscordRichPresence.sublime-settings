@@ -41,6 +41,12 @@
     // Use the language icon as the big icon, overrides 'small_icon'
     "big_icon": true,
 
+    // Show button for opening git repository on browser
+    "git_repository_button": false,
+
+    // Default message for git repository button (supports format)
+    "git_repository_message": "Open Repository",
+
     // Defines the order of name sources that should be used for the project name in format stings, if available.
     //
     //   "project_file_name" - The name of the .sublime-project file.

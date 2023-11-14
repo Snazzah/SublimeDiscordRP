@@ -2,6 +2,8 @@ from functools import partial
 import logging
 import os
 import time
+import re
+import subprocess
 from time import mktime
 
 import sublime
@@ -230,6 +232,13 @@ def handle_activity(view, is_write=False, idle=False):
     if settings.get('show_elapsed_time'):
         act['timestamps'] = {'start': stamp}
 
+    if settings.get('git_repository_button'):
+        git_url = get_git_url(entity)
+        git_btn_format = settings.get('git_repository_message')
+
+        if git_btn_format and git_url is not None:
+            act['buttons'] = [{'label': git_btn_format.format(**format_dict), 'url': git_url}]
+
     logger.info(window.folders())
     try:
         ipc.set_activity(act)
@@ -254,6 +263,81 @@ def handle_error(exc, retry=True):
         global is_connecting
         is_connecting = True
         sublime.set_timeout_async(connect_background, 0)
+
+
+def git_config_parser(path):
+    obj = dict()
+    with open(path) as cfg:
+        lines = cfg.read().split("\n")
+        current_section = None
+
+        for line in lines:
+            # remove comments and spaces
+            line = re.sub(" |;(.*)|#(.*)", "", line)
+            if not line:
+                continue
+
+            if line.startswith("["):
+                res = re.search('"(.*)"', line)
+                if res is not None:
+                    sec_name = re.sub('\[|"(.*)"|\]', "", line)
+                    subsec_name = res.group(1)
+                    if sec_name not in obj:
+                        obj[sec_name] = {}
+
+                    obj[sec_name][subsec_name] = {}
+                    current_section = [sec_name, subsec_name]
+                else:
+                    sec_name = re.sub("\[|\]", "", line)
+                    obj[sec_name] = {}
+                    current_section = [sec_name]
+
+            else:
+                parts = re.sub("\t|\0", "",line).split("=")
+                if len(current_section) < 2:
+                    obj[current_section[0]][parts[0]] = parts[1]
+                else:
+                    obj[current_section[0]][current_section[1]][parts[0]] = parts[1]
+
+    return obj
+
+
+def get_git_url_from_config(folder):
+    gitcfg_path = folder+"/.git/config"
+    if os.path.exists(gitcfg_path):
+        cfg = git_config_parser(gitcfg_path)
+        if "remote" in cfg and "origin" in cfg["remote"]:
+            return cfg["remote"]["origin"]["url"]
+
+    return None
+
+
+def parse_git_url(url):
+    url = re.sub("\.git\n?$", "", url)
+    if url.startswith("https"):
+        return url
+
+    elif url.startswith("git@") or url.startswith("ssh"):
+        url = url.replace(":", "/")
+        return re.sub("git@|ssh///", "https://", url)
+
+    else:
+        return None
+
+
+def get_git_url(entity):
+    folder = os.path.dirname(entity)
+    url = None
+    try:
+        url = subprocess.check_output(["git", "-C", folder, "remote", "get-url", "origin"], universal_newlines=True, creationflags=subprocess.CREATE_NO_WINDOW)
+    except:
+        url = get_git_url_from_config(folder)
+
+    if url is not None:
+        url = parse_git_url(url)
+        return url
+
+    return None
 
 
 def get_project_name(window, current_file):
