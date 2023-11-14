@@ -96,7 +96,8 @@ ICONS = {
     'scss,sass': 'sass',
     'nim': 'nim',
     'nite,nitecode,nightcode,nc': 'nitecode',
-    'p6,pm6,pod6,raku,rakumod,rakudoc,rakutest,nqp,crotmp': 'raku'
+    'p6,pm6,pod6,raku,rakumod,rakudoc,rakutest,nqp,crotmp': 'raku',
+    'gml,yy': 'gml'
 }
 
 # Scopes we can/should fallback to
@@ -128,7 +129,8 @@ SCOPES = {
     'sass',
     'nim',
     'nitecode',
-    'raku'
+    'raku',
+    'gml'
 }
 
 
