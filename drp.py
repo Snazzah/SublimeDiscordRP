@@ -333,12 +333,16 @@ def get_git_url(entity):
     folder = os.path.dirname(entity)
     url = None
     try:
-        url = subprocess.check_output(["git", "-C", folder, "remote", "get-url", "origin"], universal_newlines=True, creationflags=subprocess.CREATE_NO_WINDOW)
+        si = None
+        if os.name == 'nt':
+            si = subprocess.STARTUPINFO()
+            si.dwFlags = subprocess.SW_HIDE | subprocess.STARTF_USESHOWWINDOW
+        url = subprocess.check_output(["git", "-C", folder, "remote", "get-url", "origin"], universal_newlines=True, startupinfo=si)
     except:
         url = get_git_url_from_config(folder)
 
     if url is not None:
-        url = parse_git_url(url)
+        url = parse_git_url(url).strip()
         return url
 
     return None
