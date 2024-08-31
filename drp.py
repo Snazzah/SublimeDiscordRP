@@ -457,7 +457,7 @@ class DRPListener(sublime_plugin.EventListener):
                 logger.info("Setting presence to file %r from %r", view.file_name(), last_file)
                 handle_activity(view)
 
-    def on_load_async(self, view):
+    def on_activated_async(self, view):
         handle_activity(view)
 
     def on_close(self, view):
