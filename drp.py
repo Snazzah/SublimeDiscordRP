@@ -27,7 +27,7 @@ start_time = mktime(time.localtime())
 stamp = start_time
 
 
-def base_activity(started = False):
+def base_activity(started=False):
     activity = {
         'assets': {
             'small_image': 'afk',
@@ -80,7 +80,7 @@ ICONS = {
     'png,jpg,jpeg,jfif,gif,webp': 'image',
     'py,pyx': 'python',
     'p,sp': 'pawn',
-    'r,rda,rdata,rds,rhistory' : 'r',
+    'r,rda,rdata,rds,rhistory': 'r',
     'rb': 'ruby',
     'rs': 'rust',
     'sh,bat': 'shell',
@@ -142,10 +142,9 @@ SCOPES = {
 
 def get_icon(file, ext, _scope):
     main_scope = _scope.split()[0]
-    base_scope = main_scope.split('.')[0]
     try:
         sub_scope = '.'.join(main_scope.split()[0].split('.')[1::])
-    except:
+    except Exception:
         sub_scope = ''
 
     for _icon in ICONS:
@@ -160,7 +159,8 @@ def get_icon(file, ext, _scope):
                 else:
                     icon = 'unknown'
 
-    if file == 'LICENSE': icon = 'license'
+    if file == 'LICENSE':
+        icon = 'license'
     logger.debug('Using icon "%s" for file %s (scope: %s)', icon, file, main_scope)
 
     return 'https://raw.githubusercontent.com/Snazzah/SublimeDiscordRP/master/icons/lang-%s.png' % icon
@@ -199,8 +199,10 @@ def handle_activity(view):
 
     logger.info('Updating activity')
 
-    try: extension = entity.split('.')[len(entity.split('.')) - 1]
-    except: extension = ''
+    try:
+        extension = entity.split('.')[len(entity.split('.')) - 1]
+    except Exception:
+        extension = ''
 
     language = os.path.splitext(os.path.basename(view.settings().get('syntax')))[0]
     if len(language) < 2:
@@ -287,7 +289,7 @@ def git_config_parser(path):
             if line.startswith("["):
                 res = re.search('"(.*)"', line)
                 if res is not None:
-                    sec_name = re.sub('\[|"(.*)"|\]', "", line)
+                    sec_name = re.sub(r'\[|"(.*)"|\]', "", line)
                     subsec_name = res.group(1)
                     if sec_name not in obj:
                         obj[sec_name] = {}
@@ -295,12 +297,12 @@ def git_config_parser(path):
                     obj[sec_name][subsec_name] = {}
                     current_section = [sec_name, subsec_name]
                 else:
-                    sec_name = re.sub("\[|\]", "", line)
+                    sec_name = re.sub(r"\[|\]", "", line)
                     obj[sec_name] = {}
                     current_section = [sec_name]
 
             else:
-                parts = re.sub("\t|\0", "",line).split("=")
+                parts = re.sub("\t|\0", "", line).split("=")
                 if len(current_section) < 2:
                     obj[current_section[0]][parts[0]] = parts[1]
                 else:
@@ -310,7 +312,7 @@ def git_config_parser(path):
 
 
 def get_git_url_from_config(folder):
-    gitcfg_path = folder+"/.git/config"
+    gitcfg_path = folder + "/.git/config"
     if os.path.exists(gitcfg_path):
         cfg = git_config_parser(gitcfg_path)
         if "remote" in cfg and "origin" in cfg["remote"]:
@@ -320,7 +322,7 @@ def get_git_url_from_config(folder):
 
 
 def parse_git_url(url):
-    url = re.sub("\.git\n?$", "", url)
+    url = re.sub(r"\.git\n?$", "", url)
     if url.startswith("https"):
         return url
 
@@ -341,7 +343,7 @@ def get_git_url(entity):
             si = subprocess.STARTUPINFO()
             si.dwFlags = subprocess.SW_HIDE | subprocess.STARTF_USESHOWWINDOW
         url = subprocess.check_output(["git", "-C", folder, "remote", "get-url", "origin"], universal_newlines=True, startupinfo=si)
-    except:
+    except Exception:
         url = get_git_url_from_config(folder)
 
     if url is not None:
