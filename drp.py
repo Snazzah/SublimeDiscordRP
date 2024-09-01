@@ -455,15 +455,32 @@ def disconnect():
         ipc = None
 
 
+deactivate_bounce_count = 0
+
+
+def _bounce_deactivate(expected_bounce_count):
+    if deactivate_bounce_count == expected_bounce_count:
+        reset_activity()
+
+
 class DRPListener(sublime_plugin.EventListener):
 
     def on_activated_async(self, view):
-        if not is_view_active(view):
-            return
-        if view.file_name() == last_file:
+        global deactivate_bounce_count
+        deactivate_bounce_count += 1
+
+        if not is_view_active(view) or view.file_name() == last_file:
             return
         logger.debug("Setting presence to file %r from %r", view.file_name(), last_file)
         handle_activity(view)
+
+    def on_deactivated_async(self, _view):
+        global deactivate_bounce_count
+        deactivate_bounce_count += 1
+
+        timeout = settings.get('idle_timeout') * 1000
+        sublime.set_timeout_async(partial(_bounce_deactivate, deactivate_bounce_count), timeout)
+        reset_activity()
 
 
 class DiscordrpConnectCommand(sublime_plugin.ApplicationCommand):
