@@ -181,7 +181,7 @@ def sizehf(num):
     return "%.1f%s%s" % (num, 'Yi', 'B')
 
 
-def handle_activity(view, is_write=False, idle=False):
+def handle_activity(view):
     window = view.window()
     entity = view.file_name()
     if not (ipc and window and entity):
@@ -229,7 +229,6 @@ def handle_activity(view, is_write=False, idle=False):
     main_scope = view.scope_name(0)
     icon = get_icon(format_dict['file'], format_dict['extension'], main_scope)
     if settings.get('big_icon'):
-        act['assets']['small_image'] = 'afk' if idle == True else act['assets']['small_image']
         act['assets']['small_text'] = act['assets']['small_text']
         act['assets']['large_image'] = icon
         act['assets']['large_text'] = language
@@ -383,12 +382,18 @@ def find_folder_containing_file(folders, current_file):
 
 
 def is_view_active(view):
-    if view:
-        active_window = sublime.active_window()
-        if active_window:
-            active_view = active_window.active_view()
-            if active_view:
-                return active_view.buffer_id() == view.buffer_id()
+    if not view:
+        return False
+
+    if int(sublime.version()) > 4000:
+        return view.element() is None
+
+    active_window = sublime.active_window()
+    if active_window:
+        active_view = active_window.active_view()
+        if active_view:
+            return active_view.buffer_id() == view.buffer_id()
+
     return False
 
 
@@ -450,25 +455,13 @@ def disconnect():
 
 class DRPListener(sublime_plugin.EventListener):
 
-    def on_post_save_async(self, view):
-        handle_activity(view, is_write=True)
-
-    def on_modified_async(self, view):
-        if is_view_active(view):
-            if view.file_name() != last_file:
-                logger.info("Setting presence to file %r from %r", view.file_name(), last_file)
-                handle_activity(view)
-
     def on_activated_async(self, view):
+        if not is_view_active(view):
+            return
+        if view.file_name() == last_file:
+            return
+        logger.debug("Setting presence to file %r from %r", view.file_name(), last_file)
         handle_activity(view)
-
-    def on_close(self, view):
-        active_window = sublime.active_window()
-        if active_window:
-            active_view = active_window.active_view()
-            if active_view: handle_activity(active_view)
-            else: reset_activity()
-        else: reset_activity()
 
 
 class DiscordrpConnectCommand(sublime_plugin.ApplicationCommand):
