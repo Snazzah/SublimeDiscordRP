@@ -478,9 +478,9 @@ class DRPListener(sublime_plugin.EventListener):
         global deactivate_bounce_count
         deactivate_bounce_count += 1
 
-        timeout = settings.get('idle_timeout') * 1000
-        sublime.set_timeout_async(partial(_bounce_deactivate, deactivate_bounce_count), timeout)
-        reset_activity()
+        timeout = settings.get('idle_timeout', 0) * 1000
+        if timeout:
+            sublime.set_timeout_async(partial(_bounce_deactivate, deactivate_bounce_count), timeout)
 
 
 class DiscordrpConnectCommand(sublime_plugin.ApplicationCommand):
