@@ -474,6 +474,10 @@ class DRPListener(sublime_plugin.EventListener):
         logger.debug("Setting presence to file %r from %r", view.file_name(), last_file)
         handle_activity(view)
 
+    def on_post_save_async(self, view):
+        # Refresh template variables
+        handle_activity(view)
+
     def on_deactivated_async(self, _view):
         global deactivate_bounce_count
         deactivate_bounce_count += 1
