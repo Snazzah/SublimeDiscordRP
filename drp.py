@@ -258,6 +258,7 @@ def handle_activity(view):
 def reset_activity(started = False):
     if not ipc:
         return
+    global last_file
     last_file = ''
     try: ipc.set_activity(base_activity(started))
     except OSError as e: handle_error(e)
@@ -460,12 +461,14 @@ deactivate_bounce_count = 0
 
 def _bounce_deactivate(expected_bounce_count):
     if deactivate_bounce_count == expected_bounce_count:
+        logger.debug("Idle timeout reached")
         reset_activity()
 
 
 class DRPListener(sublime_plugin.EventListener):
 
     def on_activated_async(self, view):
+        global last_file
         global deactivate_bounce_count
         deactivate_bounce_count += 1
 
