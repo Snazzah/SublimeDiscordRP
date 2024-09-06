@@ -52,5 +52,8 @@
     //   "project_file_name" - The name of the .sublime-project file.
     //   "project_folder_name" - The name of the folder in the project that the file being edited resides in.
     //   "folder_name" - The name of the folder containing the file being edited, or the parent folder (when the folder name is 'src').
-    "project_name": ["project_file_name", "project_folder_name", "folder_name"]
+    "project_name": ["project_file_name", "project_folder_name", "folder_name"],
+
+    // Time after leaving ST that the activity will be reset, in seconds. Set to 0 to disable.
+    "idle_timeout": 0,
 }

@@ -27,7 +27,7 @@ start_time = mktime(time.localtime())
 stamp = start_time
 
 
-def base_activity(started = False):
+def base_activity(started=False):
     activity = {
         'assets': {
             'small_image': 'afk',
@@ -80,7 +80,7 @@ ICONS = {
     'png,jpg,jpeg,jfif,gif,webp': 'image',
     'py,pyx': 'python',
     'p,sp': 'pawn',
-    'r,rda,rdata,rds,rhistory' : 'r',
+    'r,rda,rdata,rds,rhistory': 'r',
     'rb': 'ruby',
     'rs': 'rust',
     'sh,bat': 'shell',
@@ -142,10 +142,9 @@ SCOPES = {
 
 def get_icon(file, ext, _scope):
     main_scope = _scope.split()[0]
-    base_scope = main_scope.split('.')[0]
     try:
         sub_scope = '.'.join(main_scope.split()[0].split('.')[1::])
-    except:
+    except Exception:
         sub_scope = ''
 
     for _icon in ICONS:
@@ -160,7 +159,8 @@ def get_icon(file, ext, _scope):
                 else:
                     icon = 'unknown'
 
-    if file == 'LICENSE': icon = 'license'
+    if file == 'LICENSE':
+        icon = 'license'
     logger.debug('Using icon "%s" for file %s (scope: %s)', icon, file, main_scope)
 
     return 'https://raw.githubusercontent.com/Snazzah/SublimeDiscordRP/master/icons/lang-%s.png' % icon
@@ -181,7 +181,7 @@ def sizehf(num):
     return "%.1f%s%s" % (num, 'Yi', 'B')
 
 
-def handle_activity(view, is_write=False, idle=False):
+def handle_activity(view):
     window = view.window()
     entity = view.file_name()
     if not (ipc and window and entity):
@@ -199,8 +199,10 @@ def handle_activity(view, is_write=False, idle=False):
 
     logger.info('Updating activity')
 
-    try: extension = entity.split('.')[len(entity.split('.')) - 1]
-    except: extension = ''
+    try:
+        extension = entity.split('.')[len(entity.split('.')) - 1]
+    except Exception:
+        extension = ''
 
     language = os.path.splitext(os.path.basename(view.settings().get('syntax')))[0]
     if len(language) < 2:
@@ -229,7 +231,6 @@ def handle_activity(view, is_write=False, idle=False):
     main_scope = view.scope_name(0)
     icon = get_icon(format_dict['file'], format_dict['extension'], main_scope)
     if settings.get('big_icon'):
-        act['assets']['small_image'] = 'afk' if idle == True else act['assets']['small_image']
         act['assets']['small_text'] = act['assets']['small_text']
         act['assets']['large_image'] = icon
         act['assets']['large_text'] = language
@@ -257,6 +258,7 @@ def handle_activity(view, is_write=False, idle=False):
 def reset_activity(started = False):
     if not ipc:
         return
+    global last_file
     last_file = ''
     try: ipc.set_activity(base_activity(started))
     except OSError as e: handle_error(e)
@@ -288,7 +290,7 @@ def git_config_parser(path):
             if line.startswith("["):
                 res = re.search('"(.*)"', line)
                 if res is not None:
-                    sec_name = re.sub('\[|"(.*)"|\]', "", line)
+                    sec_name = re.sub(r'\[|"(.*)"|\]', "", line)
                     subsec_name = res.group(1)
                     if sec_name not in obj:
                         obj[sec_name] = {}
@@ -296,12 +298,12 @@ def git_config_parser(path):
                     obj[sec_name][subsec_name] = {}
                     current_section = [sec_name, subsec_name]
                 else:
-                    sec_name = re.sub("\[|\]", "", line)
+                    sec_name = re.sub(r"\[|\]", "", line)
                     obj[sec_name] = {}
                     current_section = [sec_name]
 
             else:
-                parts = re.sub("\t|\0", "",line).split("=")
+                parts = re.sub("\t|\0", "", line).split("=")
                 if len(current_section) < 2:
                     obj[current_section[0]][parts[0]] = parts[1]
                 else:
@@ -311,7 +313,7 @@ def git_config_parser(path):
 
 
 def get_git_url_from_config(folder):
-    gitcfg_path = folder+"/.git/config"
+    gitcfg_path = folder + "/.git/config"
     if os.path.exists(gitcfg_path):
         cfg = git_config_parser(gitcfg_path)
         if "remote" in cfg and "origin" in cfg["remote"]:
@@ -321,7 +323,7 @@ def get_git_url_from_config(folder):
 
 
 def parse_git_url(url):
-    url = re.sub("\.git\n?$", "", url)
+    url = re.sub(r"\.git\n?$", "", url)
     if url.startswith("https"):
         return url
 
@@ -342,7 +344,7 @@ def get_git_url(entity):
             si = subprocess.STARTUPINFO()
             si.dwFlags = subprocess.SW_HIDE | subprocess.STARTF_USESHOWWINDOW
         url = subprocess.check_output(["git", "-C", folder, "remote", "get-url", "origin"], universal_newlines=True, startupinfo=si)
-    except:
+    except Exception:
         url = get_git_url_from_config(folder)
 
     if url is not None:
@@ -383,12 +385,18 @@ def find_folder_containing_file(folders, current_file):
 
 
 def is_view_active(view):
-    if view:
-        active_window = sublime.active_window()
-        if active_window:
-            active_view = active_window.active_view()
-            if active_view:
-                return active_view.buffer_id() == view.buffer_id()
+    if not view:
+        return False
+
+    if int(sublime.version()) > 4000:
+        return view.element() is None
+
+    active_window = sublime.active_window()
+    if active_window:
+        active_view = active_window.active_view()
+        if active_view:
+            return active_view.buffer_id() == view.buffer_id()
+
     return False
 
 
@@ -448,27 +456,38 @@ def disconnect():
         ipc = None
 
 
+deactivate_bounce_count = 0
+
+
+def _bounce_deactivate(expected_bounce_count):
+    if deactivate_bounce_count == expected_bounce_count:
+        logger.debug("Idle timeout reached")
+        reset_activity()
+
+
 class DRPListener(sublime_plugin.EventListener):
 
-    def on_post_save_async(self, view):
-        handle_activity(view, is_write=True)
-
-    def on_modified_async(self, view):
-        if is_view_active(view):
-            if view.file_name() != last_file:
-                logger.info("Setting presence to file %r from %r", view.file_name(), last_file)
-                handle_activity(view)
-
     def on_activated_async(self, view):
+        global last_file
+        global deactivate_bounce_count
+        deactivate_bounce_count += 1
+
+        if not is_view_active(view) or view.file_name() == last_file:
+            return
+        logger.debug("Setting presence to file %r from %r", view.file_name(), last_file)
         handle_activity(view)
 
-    def on_close(self, view):
-        active_window = sublime.active_window()
-        if active_window:
-            active_view = active_window.active_view()
-            if active_view: handle_activity(active_view)
-            else: reset_activity()
-        else: reset_activity()
+    def on_post_save_async(self, view):
+        # Refresh template variables
+        handle_activity(view)
+
+    def on_deactivated_async(self, _view):
+        global deactivate_bounce_count
+        deactivate_bounce_count += 1
+
+        timeout = settings.get('idle_timeout', 0) * 1000
+        if timeout:
+            sublime.set_timeout_async(partial(_bounce_deactivate, deactivate_bounce_count), timeout)
 
 
 class DiscordrpConnectCommand(sublime_plugin.ApplicationCommand):
